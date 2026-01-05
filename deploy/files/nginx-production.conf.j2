@@ -1,0 +1,72 @@
+# ============================================================
+# Define rate limiting zone (put this in the http block of nginx.conf,
+# not inside your server block)
+# ============================================================
+# limit_req_zone $binary_remote_addr zone=one:10m rate=5r/s;
+# limit_req zone=one burst=10 nodelay;
+
+# ============================================================
+# Main HTTP server block (canonical domain only)
+# ============================================================
+server {
+    listen {{ http_port }};
+    server_name {{ http_host }};
+    root /var/www/{{ http_host }}/wordpress;
+    index index.php index.html index.htm index.nginx-debian.html;
+
+    client_max_body_size 200M;
+
+    # Block bad User-Agents
+    if ($http_user_agent ~* "(^$|BadBot|SomeScraper)") {
+        return 403;
+    }
+
+    # Block Abusive IPs
+    deny 34.174.159.192;
+    deny 135.220.210.229;
+
+    location / {
+        # Apply rate limiting
+        # limit_req zone=one burst=20 nodelay;
+
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_connect_timeout 300s;
+        fastcgi_read_timeout 300s;
+        fastcgi_send_timeout 300s;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    location /xmlrpc.php {
+        allow 192.0.64.0/18;
+        allow 64.34.206.0/24;
+        allow 198.181.116.0/22;
+        allow 66.155.105.128/26;
+        allow 69.90.253.0/24;
+        allow 76.74.248.128/25;
+        allow 76.74.255.0/25;
+        allow 2001:1978:1e00:3::/64;
+        allow 2620:115:c000::/40;
+        deny all;
+
+        # Also apply rate limiting specifically here if desired
+        # limit_req zone=one burst=5 nodelay;
+    }
+}
+
+# ============================================================
+# HTTP redirect (secondary → canonical)
+# ============================================================
+server {
+    listen {{ http_port }};
+    server_name {{ http_secondary }};
+
+    return 301 http://{{ http_host }}$request_uri;
+}

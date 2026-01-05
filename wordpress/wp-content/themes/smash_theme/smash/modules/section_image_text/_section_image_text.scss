@@ -1,0 +1,65 @@
+.image-text {
+    position: relative;
+    padding: 50px;
+
+    .image-text-container {
+        @extend %container_md;
+
+        .image-text-image {
+            img {
+                width: 100%;
+            }
+        }
+
+        .image-text-body {
+            @include flex(col, start, center);
+            row-gap: 20px;
+
+            .image-text-cta {
+                @extend %btn-primary;
+            }
+        }
+
+        &.image-left,
+        &.image-right {
+            column-gap: 2em;
+
+            .image-text-image {
+                flex: 1;
+            }
+
+            .image-text-body {
+                flex: 2;
+            }
+        }
+        
+        &.image-top,
+        &.image-bottom {
+            row-gap: 2em;
+
+            .image-text-image {
+                flex: 1;
+            }
+
+            .image-text-body {
+                flex: 1;
+            }
+        }
+        
+        &.image-left {
+            @include flex(row, center, center);
+        }
+        
+        &.image-right {
+            @include flex(row-rev, center, center);
+        }
+        
+        &.image-top {
+            @include flex(col, center, center);
+        }
+        
+        &.image-bottom {
+            @include flex(col-rev, center, center);
+        }
+    }
+}

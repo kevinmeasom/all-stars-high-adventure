@@ -1,0 +1,74 @@
+#contact_page {
+
+    .contact-container {
+        @extend %container_xl;
+        @include flex(wrap, center, center);
+        column-gap: 2em;
+        row-gap: 1em;
+        padding: 80px 50px;
+
+        .contact-body {
+            @include flex(col, start, center);
+            flex: 1;
+        }
+
+        .contact-form {
+            @extend %box_shadow;
+            @include flex(col, start, center);
+            flex: 1;
+            border-radius: 5px;
+            background: $bg_color_3;
+            color: $secondary_color;
+            padding: 30px;
+
+            nf-fields-wrap {
+                @include flex(wrap, null, start);
+                column-gap: 1em;
+                row-gap: 1em;
+
+                nf-field {
+                    width: 100%;
+
+                    .nf-field-container {
+                        margin: 0;
+
+                        input, textarea {
+                            background: $secondary_color;
+                            color: $primary_color;
+                            font-family: $font_body;
+                            font-weight: 300;
+                            
+                            &::placeholder {
+                                color: $primary_color;
+                                font-family: $font_body;
+                                font-weight: 300;
+                            }
+                        }
+                        
+                        textarea {
+                            height: 130px;
+                        }
+
+                        .submit-wrap {
+                            input {
+                                @extend %btn-secondary;
+                            }
+                        }
+                    }
+
+                    &:nth-child(1),
+                    &:nth-child(2),
+                    &:nth-child(3),
+                    &:nth-child(4) {
+                        width: 48%;
+                    }
+
+                }
+            }
+        }
+
+        @include respond-to(large, max){
+            @include flex(col, center, center);
+        }
+    }
+}

@@ -1,0 +1,158 @@
+body.home #masthead{
+    border-bottom: none;
+}
+
+#waypoint {
+    position: relative;
+    top: 10px;
+}
+
+#masthead {
+    @extend %ease;
+    position: relative;
+    padding: 20px;
+    font-family: $font-nav;
+    font-size: 11px;
+    letter-spacing: 1px;
+    background-color: $header_bg;
+
+    a {
+        @extend %nav_link;
+    }
+
+    .site-navigation-wrap {
+        @include flex(row, center, center);
+        position: relative;
+    }
+
+    .header-block {
+        @include flex(row, null, null);
+        float: none;
+        flex: 1;
+
+        .header-block-inner {
+            width: 100%;
+
+            .menu-container {
+                width: 100%;
+    
+                .menu {
+                    @extend %nav;
+                    width: 100%;
+                    @include flex(wrap, center, center);
+                }
+            }
+        }
+
+        &.header-left {
+            .header-block-inner {
+                @include flex(row, center, start);
+                margin-right: auto;
+
+                .site-title {
+
+                    a {
+                        @extend %link;
+                    }
+                }
+
+                @include respond-to(large, max){
+                    .site-title {
+                        display: none;
+                    }
+                }
+            }
+        }
+        &.header-middle {
+            flex: 2;
+
+            .header-block-inner {
+                @include flex(row, center, center);
+
+                .site-title {
+                    display: none;
+
+                    a {
+                        @extend %link;
+                    }
+                    
+                    @include respond-to(large, max){
+                        display: none !important;
+                    }
+                }
+            }
+
+            @include respond-to(large, max){
+                display: none !important;
+            }
+        }
+        &.header-right {
+            .header-block-inner {
+                @include flex(row, center, end);
+                column-gap: 1em;
+                margin-left: auto;
+
+                .header-cta {
+                    @extend %btn-primary;
+                }
+            }
+        }
+    }
+
+    .fab{
+        font-size: 13px;
+        padding: 0;
+    }
+
+    &.lock_nav {
+        @extend %box_shadow;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100000;
+
+        .site-navigation-wrap {
+            .header-block {
+                &.header-left {
+                    .header-block-inner {
+                    }
+                }
+                &.header-middle {
+                    .header-block-inner {
+                    }
+                }
+                &.header-right {
+                    .header-block-inner {
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(large, max) {
+        #mobile_nav_wrap {
+            @include flex(row, null, start);
+        }
+
+        .site-navigation-wrap{
+            @include flex(row, center, between);
+        }
+    }
+}
+
+#logo_wrap {
+    @include flex(row, center, center);
+    position: relative;
+    padding: 50px 20px;
+    z-index: 1;
+
+    img {
+        max-height: 100px;
+        width: auto;
+    }
+
+    @include respond-to(medium, max) {
+        padding: 20px;
+    }
+}

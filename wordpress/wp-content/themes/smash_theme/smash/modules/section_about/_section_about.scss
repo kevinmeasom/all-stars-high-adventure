@@ -1,0 +1,73 @@
+.about-section {
+    position: relative;
+    padding: 100px 50px;
+
+    .about-section-container {
+        @extend %container_xl;
+        @include flex(row, center, center);
+        column-gap: 2em;
+        row-gap: 2em;
+
+        .about-section-body {
+            @include flex(col, center, center);
+            row-gap: 1em;
+            width: 54%;
+            text-align: center;
+            
+            .about-section-subtitle {
+                @extend %sub_title;
+            }
+
+            .about-section-text {
+                font-size: 13px;
+                line-height: 26px;
+            }
+
+            .about-section-ctas {
+                @include flex(wrap, center, center);
+
+                .about-cta {
+                    @extend %btn-secondary;
+                }
+            }
+
+            @include respond-to(large, max){
+                width: 100%;
+            }
+        }
+
+        .about-section-image {
+            position: relative;
+            width: 36%;
+            z-index: 2;
+
+            @include respond-to(large, max){
+                width: 100%;
+            }
+        }
+
+        @include respond-to(large, max){
+            @include flex(col, center, center);
+        }
+    }
+
+    &.has-bg {
+        background: $bg_color;
+    }
+
+    @include respond-to(medium, max) {
+        padding: 50px 20px;
+
+        .about-section-container {
+            flex-direction: column-reverse !important;
+
+            .about-section-body {
+                width: 100%;
+            }
+            .about-section-image {
+                width: 90%;
+                margin-bottom: 25px;
+            }
+        }
+    }
+}

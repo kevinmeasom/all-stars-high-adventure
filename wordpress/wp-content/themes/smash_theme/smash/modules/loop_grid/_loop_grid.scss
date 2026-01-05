@@ -1,0 +1,29 @@
+.grid-loop {
+    position: relative;
+    padding: 50px;
+
+    .grid-loop-header {
+        @extend %container_xl;
+    }
+
+    .grid-loop-container,
+    .grid-loop-container .alm-reveal {
+        @extend %container_xl;
+        @include flex(wrap, null, center);
+
+        .post-block {
+            width: 25%;
+
+            @include respond-to(large, max) {
+                width: 50%;
+            }
+            @include respond-to(medium, max) {
+                width: 100%;
+            }
+        }
+    }
+
+    @include respond-to(medium, max) { 
+        padding: 20px;     
+    }
+}

@@ -1,0 +1,92 @@
+.cta-images-wrapper {
+    position: relative;
+    padding: 70px 50px;
+    margin: 100px 0;
+    background: $bg_color;
+
+    .cta-images-container {
+        
+        .cta-images-body {
+            @extend %container_sm;
+            @include flex(col, center, center);
+            text-align: center;
+            row-gap: 1em;
+
+            .cta-images-subtitle {
+                text-transform: uppercase;
+                font-size: 12px;
+                line-height: 25px;
+                letter-spacing: 2px;
+            }
+
+            .cta-images-title {
+                font-size: 50px;
+                line-height: 76px;
+                letter-spacing: 1px;
+
+                span {
+                    font-weight: 700;
+                }
+            }
+
+            .cta-images-text {
+                font-size: 15px;
+                line-height: 32px;
+            }
+            
+            .cta-images-cta {
+                @extend %btn-primary;
+            }
+        }
+
+        .cta-image-left {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 20%;
+            max-width: 268px;
+            z-index: 1;
+            transform: translate(0, 50px);
+            border: 10px solid white;
+            border-left: none;
+        }
+        .cta-image-right {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 20%;
+            max-width: 268px;
+            z-index: 1;
+            transform: translate(0, -50px);
+            border: 10px solid white;
+            border-right: none;
+        }
+    }
+
+    @include respond-to(xlarge, max) {
+        .cta-images-container {
+            .cta-image-right {
+                transform: translate(0, -70%);
+            }
+        }
+    }
+
+    @include respond-to(medium, max) {
+        padding: 70px 30px;
+        margin-bottom: 180px;
+
+        .cta-images-container {
+            .cta-image-left {
+                width: 50%;
+                transform: translate(0, 100%);
+            }
+
+            .cta-image-right {
+                width: 50%;
+                bottom: 0;
+                top: unset;
+                transform: translate(0, 100%);
+            }
+        }
+    }
+}

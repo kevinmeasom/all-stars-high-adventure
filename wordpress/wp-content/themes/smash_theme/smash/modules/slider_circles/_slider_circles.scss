@@ -1,0 +1,135 @@
+#circle_links {
+    @include flex(col, center, center);
+    row-gap: 2em;
+    position: relative;
+    width: 100%;
+    margin: 0;
+
+    .circle-links-header {
+        @include flex(row, center, center);
+
+        &.has-cta {
+            @include flex(row, center, between);
+        }
+
+        .circle-links-title {
+            margin: 0;
+        }
+        
+        .circle-links-cta {
+            @include flex(row, center, end);
+        }
+    }
+    
+    .circle-links-container {
+        @extend %container_xl;
+        width: 100%;
+        text-align: center;
+
+        a.circle-links-cta {
+            letter-spacing: 1px;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding-left: 5px;
+        }
+    }
+    
+    .circle-links-slider {
+        @extend %ease;
+        visibility: hidden;
+        opacity: 0;
+
+        &.slick-initialized {
+
+            &.show-slider {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+
+        .slick-arrow {
+            top: 42%;
+        }
+        .circle-slide {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+
+            .circle-slide-inner {
+                @include flex(col, center, center);
+
+                .circle-slide-image {
+                    width: 100%;
+                    border-radius: 100%;
+                    border: 8px solid $secondary_color;
+
+                    &:hover {
+                        opacity: 0.8;
+                    }
+                }
+
+                .circle-slide-text {
+                    text-transform: uppercase;
+                    font-family: $font_nav2;
+                    margin-top: 15px;
+                    letter-spacing: 1px;
+                    font-size: 12px;
+
+                    &:hover {
+                        color: $link_hover;
+                    }
+                }
+            }
+        }
+    }
+
+    &.has-bg {
+        background: $bg_color;
+        padding: 50px;
+
+        .circle-links-header {
+            @include flex(row, center, center);
+    
+            .circle-links-title {
+                font-size: 34px;
+                line-height: 40px;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        @include respond-to(xlarge, max) {
+            padding: 0;
+
+            .circle-links-header {
+                @include flex(col, center, center);
+
+                .circle-links-cta {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    @include respond-to(xlarge, max) { 
+        padding: 10px 50px 30px;
+    }
+
+    @include respond-to(medium, max) {
+        padding: 0 20px 30px;
+
+        .circle-links-slider {
+            .circle-slide {
+                padding: 0px 10px;
+
+                .circle-slide-inner {
+                    padding: 0 30px;
+                }
+            }
+            .slick-arrow {
+                top: 34%;
+            }
+        }
+    }
+}
+

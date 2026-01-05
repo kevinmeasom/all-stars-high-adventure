@@ -1,0 +1,181 @@
+#hero_slider {
+    position: relative;
+    padding: 30px 20px 90px;
+
+    .slick-slider {
+        position: relative;
+
+        .slick-dots {
+            @include flex(col, center, start);
+            margin: 0;
+            position: absolute;
+            bottom: 0;
+            left: -20px;
+            width: auto;
+            z-index: 100;
+            
+            li {
+                line-height: normal;
+                width: auto;
+                height: auto;
+
+                button {
+                    display: block !important;
+                    margin: 5px !important;
+
+                    &::before {
+                        display: none;
+                    }
+                }
+            }
+        }
+        .slick-arrow {
+            @include flex(row, center, center);
+            background: $accent_color;
+            padding: 3px;
+            border-radius: 100%;
+            width: 25px;
+            height: 25px;
+
+            &.slick-prev {
+                top: 45%;   
+                left: 0;
+
+                @include respond-to(xlarge, max){
+                    left: -15px;
+                }
+            }
+            
+            &.slick-next {
+                top: 45%;   
+                right: 0;
+
+                @include respond-to(xlarge, max){
+                    right: -15px;
+                }
+            }
+
+            .icon {
+                width: 15px;
+                height: 15px;
+            }
+
+            &:hover {
+                background: $accent_color_2;
+            }
+        }
+    }
+
+    .hero-slide {
+        padding-left: 40px;
+
+        .hero-image {
+            position: relative;
+            @include flex(row, end, end);
+            padding: 0 50px;
+            width: 100%;
+
+            .post-products-wrap {
+                .post-products-trigger {
+                    @include flex(row, center, center);
+                    top: 30px;
+                    bottom: unset;
+                    left: 0;
+                    right: unset;
+                    transform: translate(-40px, 0);
+                    font-weight: bold !important;
+                    font-size: 13px !important;
+
+                    span {
+                        transform: unset;
+                        margin: 0;
+                        margin-left: 5px;
+                    }
+                }
+                .post-products {
+                    top: 0;
+                }
+            }
+
+            .hero-body {
+                @include flex(col, center, center);
+                background: $secondary_color;
+                text-align: center;
+                max-width: 385px;
+                padding: 90px 30px;
+
+                h2 {
+                    font-size: 29px;
+                    line-height: 36px;
+                    margin-bottom: 30px;
+                }
+
+                .hero-cta {
+                    @extend %bg_link;
+                    font-size: 13px;
+                    letter-spacing: 1px;
+                }
+            }
+        }
+    }
+
+    @include respond-to(xxlarge, max) {
+        .hero-slide {
+            .hero-image { 
+                padding: 50px 30px 0;
+
+                .hero-body {
+                    padding: 40px 34px;
+                }
+            }
+        }
+    }
+
+    @include respond-to(xlarge, max) {
+        .hero-slide {
+            padding-left: 0px;
+            
+            .hero-image { 
+                height: 450px !important;
+
+                .hero-body {
+                    padding: 28px 25px;
+                    max-width: 280px;
+
+                    h2.hero-title {
+                        font-size: 21px;
+                        line-height: 29px;
+                    }
+                }
+
+                .post-products-wrap {
+                    .post-products-trigger {
+                        transform: translate(0, 0);
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max) {
+        padding: 50px 30px;
+
+        .hero-slide {
+
+            .hero-image { 
+                height: 450px !important;
+
+                .hero-body {
+                    background-color: rgba(255,255,255,0.80);
+                    padding: 21px 22px;
+
+                    h2.hero-title {
+                        font-size: 17px;
+                        line-height: 24px;
+                        margin-bottom: 20px;
+                    }
+                }
+            }
+        }
+    }
+}

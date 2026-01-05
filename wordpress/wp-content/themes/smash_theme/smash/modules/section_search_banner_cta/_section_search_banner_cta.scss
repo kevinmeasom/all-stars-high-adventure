@@ -1,0 +1,86 @@
+.search-banner-cta {
+    position: relative;
+    margin: 50px 0;
+
+    .search-banner-cta-image {
+        @include flex(row, center, center);
+        width: 100%;
+        padding: 0;
+
+        .search-banner-cta-body {
+            background: rgba(black, 0.50);
+            text-align: center;
+            max-width: none;
+            width: 100%;
+            height: 100%;
+            padding: 30px;
+            display: flex;
+            flex-direction:  column;
+            align-items: center;
+            justify-content: center;
+
+            .search-banner-cta-text {
+                padding: 10px 0 20px;
+                color: white;
+            }
+
+            .search-banner-cta-title {
+                font-size: 70px;
+                margin: 20px 0 40px;
+                color: white;
+                span {
+                    display: block;
+                    font-size: 18px;
+                }
+            }
+
+            .search-banner-cta-subtitle {
+                font-size: 20px;
+                color: white;
+            }
+
+            .search-banner-cta-btn {
+                span {
+                    font-size: 16px;
+                    font-weight: 700;
+                    letter-spacing: 1.3px;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    @include respond-to(large, max) { 
+        padding: 20px 40px 0px;
+
+        .search-banner-cta-image {
+            .search-banner-cta-body {
+                .search-banner-cta-title {
+                    font-size: 50px;
+                    margin: 20px 0;
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max) { 
+        padding: 0;
+
+        .search-banner-cta-image {
+
+            .search-banner-cta-body {
+                .search-banner-cta-title {
+                    font-size: 30px;
+                }
+
+                .search-banner-cta-subtitle {
+                    font-size: 16px;
+                }
+
+                .search-banner-cta-btn {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}

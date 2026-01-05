@@ -1,0 +1,9 @@
+---
+#HTTP Settings
+http_prot: "http"
+http_host: "137.184.33.166"
+http_conf: "137.184.33.166.conf"
+
+#Project Settings
+project_branch: "staging"
+db_prefix: "wp_"

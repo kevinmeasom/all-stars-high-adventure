@@ -1,0 +1,88 @@
+.shop-highlights {
+    position: relative;
+    padding: 50px;
+
+    .shop-highlights-inner {
+
+        .shop-highlights-wrapper {
+            @include flex(row, center, between);
+            
+            .shop-highlights-image {
+                position: relative;
+                width: 42%;
+            }
+    
+            .shop-highlights-body {
+                @include flex(col, center, center);
+                width: 65%;
+                margin-right: -20px;
+                padding-left: 65px;
+
+                .shop-highlights-title {
+                    text-align: center;
+                }
+    
+                .shop-highlights-products {
+                    @include flex(wrap, start, between);
+                    margin-bottom: 20px;
+
+                    .product {
+                        width: 33%;
+                        padding: 20px;
+                        text-align: center;
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(xxlarge, max) { 
+        .shop-highlights-inner {
+            .shop-highlights-wrapper {
+                .shop-highlights-body {
+                    padding-left: 40px;
+                }
+            }
+        }
+    }
+
+    @include respond-to(large, max) { 
+        padding: 50px 40px;
+
+        .shop-highlights-inner {
+            .shop-highlights-wrapper {
+                .shop-highlights-body {
+                    padding-left: 20px;
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max) { 
+        padding: 20px;
+
+        .shop-highlights-inner {
+            .shop-highlights-wrapper {
+                flex-direction: column !important;
+
+                .shop-highlights-image {
+                    width: 100%;
+                    margin-bottom: 20px;
+                }
+
+                .shop-highlights-body {
+                    padding-left: 0px;
+                    width: 100%;
+                    margin-right: 0px;
+
+                    .shop-highlights-products {
+                        .product {
+                            width: 50%;
+                            padding: 10px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

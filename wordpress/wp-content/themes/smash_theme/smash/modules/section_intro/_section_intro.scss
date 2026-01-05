@@ -1,0 +1,21 @@
+.intro-wrapper {
+    position: relative;
+    padding: 50px;
+
+    .intro-container {
+        @extend %container_md;
+        @include flex(col, center, center);
+        text-align: center;
+        row-gap: 2em;
+        
+        .intro-ctas {
+            @include flex(wrap, center, center);
+            column-gap: 1em;
+            row-gap: 1em;
+            
+            .intro-cta {
+                @extend %btn-primary;
+            }
+        }
+    }
+}

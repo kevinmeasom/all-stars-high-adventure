@@ -1,0 +1,66 @@
+---
+#HTTP Settings
+http_port: "80"
+letsencrypt_email: "tools@smashcreative.com" 
+
+#Project Settings
+docker_path: "~/wp-local-docker-sites"
+assets_repo: "git@bitbucket.org:smashcreative/smash-assets.git"
+project_folder: "allstarshighadventure"
+project_git_repo: "git@github.com:kevinmeasom/all-stars-high-adventure.git"
+project_theme: "smash_theme"
+
+#Wordpress Settings
+wp_admin_user: "kevinmeasom"
+wp_admin_pw: "saTE0OTE8Bw3GUD8ykI@8ZEc"
+wp_admin_email: "info@allstarshighadventure.com"
+wp_migrate_db_key: "eefca343-4179-48d8-8736-fa6574f0610a"
+
+#MySQL Settings
+mysql_root_password: "corn.putty.mgmt.meadow"
+mysql_db: "wordpress"
+mysql_user: "smashcreative"
+mysql_password: "aq5E5o2ZzL"
+
+#System Settings
+ansible_python_interpreter: "/usr/bin/python3"
+php_modules: [ 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
+app_user: "smashcreative"
+timezone: "America/Denver"
+
+#Fail2Ban
+ip_whitelist:
+  - ""
+
+fail2ban_package: fail2ban
+
+fail2ban_loglevel: INFO
+fail2ban_logtarget: /var/log/fail2ban.log
+fail2ban_socket: /var/run/fail2ban/fail2ban.sock
+
+fail2ban_ignoreip: 127.0.0.1/8 {{ ip_whitelist | join(' ') }}
+fail2ban_bantime: 600
+fail2ban_maxretry: 6
+
+fail2ban_backend: polling
+
+fail2ban_destemail: root@localhost
+fail2ban_banaction: iptables-multiport
+fail2ban_mta: sendmail
+fail2ban_protocol: tcp
+fail2ban_chain: INPUT
+
+fail2ban_action: action_
+
+fail2ban_services:
+  - name: ssh
+    port: ssh
+    filter: sshd
+    logpath: /var/log/auth.log
+
+#Environments
+environments:
+  - name: staging
+    db_name: wordpress_staging
+  - name: production
+    db_name: wordpress_production

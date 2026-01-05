@@ -1,0 +1,69 @@
+.hero-video-popup {
+    @include flex(row, center, center);
+    position: relative;
+    width: 100%;
+    color: $secondary_color;
+
+    .hero-video-popup-body {
+        @include flex(col, center, center);
+        position: relative;
+        text-align: center;
+        row-gap: 2em;
+        z-index: 2;
+
+        .hero-video-popup-cta {
+            @extend %btn-primary;
+        }
+    }
+
+    &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        background: $overlay_black;
+    }
+}
+.popup-video {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100000;
+    background: $overlay_black;
+
+    .popup-video-inner {
+        @include flex(row, center, center);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        .popup-video-container {
+            @extend %container_md;
+            position: relative;
+            padding: 30px;
+
+            .popup-video-close {
+                @extend %btn-secondary;
+                @include flex(row, center, center);
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: 5px !important;
+                z-index: 1;
+            }
+
+            .embed-container {
+                width: 100%;
+            }
+        }
+    }
+}

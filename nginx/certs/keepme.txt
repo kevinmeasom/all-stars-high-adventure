@@ -1,0 +1,2 @@
+# Generate certs using below
+openssl req -x509 -newkey rsa:4096 -keyout nginx/certs/privkey.pem -out nginx/certs/fullchain.pem -days 365 -nodes -subj "/CN=mysite.test"

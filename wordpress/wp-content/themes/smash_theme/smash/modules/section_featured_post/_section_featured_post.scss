@@ -1,0 +1,22 @@
+.featured-post {
+    @extend %container_xl;
+    @include flex(row, end, start);
+    position: relative;
+    padding: 0 80px;
+    min-height: 650px;
+    margin-bottom: 100px !important;
+
+    .featured-post-body {
+        @include flex(col, center, center);
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+        background: $secondary_color;
+        border-top: 10px solid $accent_color;
+        padding: 50px;
+
+        .featured-post-link {
+            @extend %bg_link;
+        }
+    }
+}

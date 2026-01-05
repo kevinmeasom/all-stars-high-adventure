@@ -1,0 +1,120 @@
+.tabs-wrapper {
+    @include flex(col, center, center);
+    row-gap: 2em;
+    position: relative;
+    padding: 100px 50px;
+    width: 100%;
+
+    .tabs-header {
+        @extend %container_xl;
+        @include flex(row, center, center);
+
+        .tabs-title {
+            text-align: center;
+        }
+    }
+
+    .tabs-container {
+        @extend %container_xl;
+        @include flex(row, null, center);
+
+        .tabs-content {
+            @include flex(col, center, center);
+            position: relative;
+            width: 70%;
+            
+            .tab-body {
+                @include flex(col, center, center);
+                background: $secondary_color;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -1;
+                text-align: center;
+                padding: 50px;
+
+                .tab-cta {
+                    @extend %btn-primary;
+                }
+
+                &.active {
+                    z-index: 1;
+                }
+            }
+        }
+        
+        .tabs-tabs {
+            @include flex(col, center, stretch);
+            width: 30%;
+
+            .tab-label {
+                @include flex(col, center, center);
+                @include bgSet('h4', $bgs_alt);
+                color: $secondary_color;
+                text-align: center;
+                flex: 1;
+                width: 100%;
+                
+                h4 {
+                    @include flex(col, center, center);
+                    position: relative;
+                    width: 100%;
+                    flex: 1;
+                    padding: 20px;
+                    min-height: 100px;
+
+                    @include respond-to(1100, max){
+                        font-size: $h6;
+                    }
+                }
+
+                &.active {
+                    h4 {
+                        &::after {
+                            content: '';
+                            display: block;
+                            position: absolute;
+                            left: 0;
+                            // transform: translate(0, -100%);
+                            z-index: 1;
+                            width: 0; 
+                            height: 0; 
+                            border-top: 15px solid transparent;
+                            border-bottom: 15px solid transparent;
+                            border-left: 15px solid $secondary_color;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include respond-to(1100, max){
+            @include flex(col-rev, center, center);
+
+            .tabs-tabs {
+                @include flex(row, center, center);
+                @include flex(wrap, center, center);
+                width: 100%;
+
+                .tab-label {
+                    width: auto;
+                }
+            }
+
+            .tabs-content {
+                width: 100%;
+                min-height: 400px;
+            }
+        }
+    }
+
+    @include respond-to(large, max){
+        padding: 50px 20px;
+    }
+    
+    @include respond-to(medium, max){
+        padding: 50px 0;
+    }
+}

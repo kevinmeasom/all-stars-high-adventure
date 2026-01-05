@@ -1,0 +1,165 @@
+.loop-large {
+    position: relative;
+    padding: 50px 0;
+
+    .loop-large-wrapper {
+        @include flex(col, center, center);
+        text-align: center;
+
+        .loop-large-banner {
+            position: relative;
+            width: 100%;
+
+            .loop-large-label {
+                background: $secondary_color;
+                padding: 12px 20px 10px;
+                text-align: center;
+                position: absolute;
+                top: 12%;
+                left: 0;
+                transform: translate(-50%, 0);
+                z-index: 1;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 13px;
+            }
+        }
+
+        .loop-large-content {
+            @include flex(row, end, center);
+
+            .loop-large-body {
+                @include flex(col, center, center);
+                position: relative;
+                overflow: hidden;
+                width: 57%;
+                padding: 30px 40px 0;
+
+                .rs-code {
+                    @extend %ease;
+                    background: $secondary_color;
+                    padding: 0 30px;
+                    position: absolute;
+                    bottom: -120%;
+                    left: 0;
+                    right: 0;
+                    z-index: 10;
+
+                    &.show {
+                        bottom: 0;
+                    }
+                }
+
+                .loop-title {
+                    font-family: $font_title;
+                }
+
+                .loop-text {
+                    font-size: 15px;
+                    line-height: 28px;
+                    letter-spacing: 0.5px;
+                }
+
+                .loop-actions {
+                    @include flex(row, center, center);
+                    text-transform: capitalize;
+                    color: $link_color;
+                    display: flex;
+                    font-size: 16px;
+                    letter-spacing: 2px;
+                    font-family: $font_title;
+
+                    a {
+                        @extend %link;
+                    }
+
+                    .icon {
+                        width: 9px;
+                        margin: 0px 13px 0;
+                    }
+                }
+            }
+
+            .loop-large-image {
+                width: 41%;
+                margin-top: -24%;
+                margin-right: 35px;
+                z-index: 1;
+                border: 10px solid $secondary_color;
+                border-bottom: none;
+            }            
+        }
+    }
+
+    @include respond-to(xxlarge, max) {
+        max-width: 93%;
+        margin: 0 auto;
+    }
+    
+    @include respond-to(xlarge, max) {
+        max-width: 96%;
+
+        .loop-large-wrapper {
+            .loop-large-content {
+                .loop-large-body {
+                    padding: 20px 10px 0;
+
+                    h2.loop-title {
+                        font-size: 34px;
+                    }
+
+                    .loop-text {
+                        font-size: 14px;
+                        line-height: 23px;
+                    }
+
+                    .line-sep {
+                        min-height: 30px;
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(large, max) {
+        max-width: 82%;
+
+        .loop-large-wrapper {
+            .loop-large-content {
+                .loop-large-image {
+                    margin-top: -22%;
+                    margin-right: 9px;
+                }
+                .loop-large-body {
+                    h2.loop-title {
+                        font-size: 27px;
+                        margin-bottom: 10px;
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max) { 
+        padding: 0px 0 20px;
+
+        .loop-large-wrapper {
+            .loop-large-content {
+                .loop-large-image {
+                    display: none;
+                }
+                .loop-large-body {
+                    width: 100%;
+                }
+            }
+            .loop-large-banner {
+                height: 250px !important;
+
+                .loop-large-label {
+                    top: 5%;
+                    transform: translate(-18%, 0);
+                }
+            }
+        }
+    }
+}

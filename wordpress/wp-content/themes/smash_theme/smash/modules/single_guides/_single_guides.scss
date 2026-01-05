@@ -1,0 +1,236 @@
+.guides-basic {
+    
+    .guide-basic {
+        @extend %container_lg;
+        position: relative;
+        padding: 50px 0;
+        margin-top: 50px;
+        border-top: 1px solid $line_color;
+        text-align: center;
+
+        h3.guide-title {
+            margin-bottom: 30px;
+        }
+
+        .guide-text {
+            line-height: 31px;
+            letter-spacing: 0.5px;
+        }
+
+        .guide-products {
+            @extend %container_md;
+            @include flex(wrap, null, center);
+
+            .product {
+                width: auto;
+                max-width: 285px;
+                padding: 20px;
+            }
+        }
+    }
+}
+
+.guides-rows {
+    .post-guide-row {
+        width: 100%;
+        position: relative;
+        max-width: 840px;
+        margin: 50px auto;
+    
+        & > * {
+            width: $third;
+        }
+    
+        &:nth-child(2n+1){
+            @include flex(row, center, between);
+        }
+        &:nth-child(2n){
+            @include flex(row-rev, center, between);
+        }
+    
+        img {
+            width: 28%;
+        }
+    
+        .sep {
+            width: 90px;
+            height: 2px;
+            margin: 0 2%;
+            background: black;
+        }
+    
+        .guide-body {
+            @include flex(col, start, center);
+            width: 60%;
+    
+            .guide-count{
+                font-family: $font_title;
+                font-size: 80px;
+            }
+    
+            .guide-title{
+                font-family: $font_title;
+                font-size: 30px;
+                margin-bottom: 20px;
+            }
+    
+            .guide-text{
+                font-family: $font_body;
+                margin-bottom: 30px;
+                line-height: 28px;
+    
+                a {
+                    color: $footer_bg;
+                    font-weight: 100;
+                    font-size: 14px;
+                    text-transform: none;
+                    border-bottom: none;
+                    padding-bottom: 0;
+                }
+            }
+    
+            a {
+                padding-bottom: 5px;
+                font-family: "proxima-nova", sans-serif;
+                text-transform: uppercase;
+                margin-bottom: 24px;
+                letter-spacing: 1px;
+                font-size: 13px;
+                font-weight: bold;
+            }
+        }
+    
+        @include respond-to(large, max) {
+            flex-direction: column;
+    
+                .sep{
+                    display: none;
+                }
+    
+                .guide-body{
+                    width: 100%;
+                }
+    
+                img {
+                    width: 70%;
+                    margin-bottom: 20px;
+                }
+                
+    
+            &:nth-child(2n){
+                flex-direction: column;
+            }
+        }
+    
+        @include respond-to(large, max) {
+    
+            img {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+        }
+    }
+}
+
+.guides-grid {
+    @extend %container_lg;
+    max-width: 1025px;
+    @include flex(wrap, start, center);
+
+    .guide-grid {
+
+        &.vertical {
+            @include flex(col, center, start);
+            width: 50%;
+            padding: 30px;
+
+            .guide-count {
+                font-family: $font_title;
+                font-size: 100px;
+                color: $link_color;
+            }
+
+            h3.guide-grid-title {
+                margin-bottom: 20px;
+            }
+
+            .guide-grid-text {
+                line-height: 31px;
+                letter-spacing: 0.5px;
+            }
+
+            .guide-grid-products {
+                width: 100%;
+            }
+        }
+
+        &.horizontal {
+            @include flex(row, null, center);
+            width: 100%;
+            padding: 30px;
+            margin: 30px 0;
+            border-top: 1px solid $line_color;
+            border-bottom: 1px solid $line_color;
+
+            .guide-grid-body {
+                @include flex(col, center, center);
+                width: 52%;
+                padding-right: 50px;
+                margin-right: 50px;
+                border-right: 1px solid $line_color;
+
+                .guide-count {
+                    font-family: $font_title;
+                    font-size: 100px;
+                    color: $link_color;
+                }
+
+                h3.guide-grid-title {
+                    margin-bottom: 20px;
+                }
+
+                .guide-grid-text {
+                    line-height: 31px;
+                    letter-spacing: 0.5px;
+                }
+            }
+
+            .guide-grid-products {
+                @include flex(col, center, center);
+                width: 38%;
+                
+                .post-product-slider-wrap {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max){   
+        flex-direction: column !important;
+      
+        .guide-grid {
+
+            &.vertical {
+                width: 100%;
+            }
+
+            &.horizontal {
+                flex-direction: column !important;
+
+                .guide-grid-body {
+                    padding-right: 0;
+                    margin-right: 0;
+                    border-right: none;
+                    width: 100%;
+                }
+
+                .guide-grid-products {
+                    width: 100%;
+                    margin-top: 30px;
+                }
+            }
+        }
+    }
+}

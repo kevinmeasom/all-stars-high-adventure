@@ -1,0 +1,52 @@
+.ig-section {
+    position: relative;
+    padding: 50px;
+
+    .ig-container {
+        @extend %container_xl;
+        @include flex(col, center, center);
+        row-gap: 2em;
+
+        .ig-header {
+            @include flex(row, center, center);
+            width: 100%;
+            text-align: center;
+    
+            .ig-title {
+                font-size: 40px;
+                margin: 0;
+    
+                span {
+                    font-style: italic;
+                }
+            }
+        }
+    
+        .ig-images {
+            @include flex(row, null, center);
+            column-gap: 1em;
+            width: 100%;
+    
+            .ig-image {
+                flex: 1;
+            }
+        }
+    
+        .ig-feed {
+            position: relative;
+            width: 100%;
+    
+            .ig-cta {
+                @extend %btn-primary;
+                position: absolute;
+                top: 46%;
+                left: 15%;
+                z-index: 1000;
+            }
+        }
+    }
+
+    &.has-bg {
+        background: $bg_color_2;
+    }
+}

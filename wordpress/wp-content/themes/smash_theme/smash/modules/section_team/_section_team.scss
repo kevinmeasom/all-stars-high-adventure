@@ -1,0 +1,47 @@
+.team-wrapper {
+    position: relative;
+    background: $bg_color_2;
+    padding: 80px 30px;
+
+    .team-container {
+        @extend %container_md;
+        @include flex(col, center, center);
+        row-gap: 1em;
+        text-align: center;
+
+        .team-members {
+            @include flex(wrap, null, center);
+            column-gap: 2em;
+            width: 100%;
+
+            .team-member {
+                @include flex(col, center, stretch);
+                flex: 1;
+
+                .team-member-image {
+                    @extend %box_shadow;
+                    width: 100%;
+                    max-width: 215px;
+                    border-radius: 100%;
+                    margin-bottom: 1em;
+                }
+
+                .team-member-name {
+                    flex: 1;
+                }
+
+                @include respond-to(large, max){
+                    &:nth-child(2) {
+                        grid-column: span 2;
+                        grid-row: 1;
+                    }
+                }
+            }
+
+            @include respond-to(large, max){
+                display: grid !important;
+                @include grid(1fr 1fr, auto, 1em, 2em);
+            }
+        }
+    }
+}

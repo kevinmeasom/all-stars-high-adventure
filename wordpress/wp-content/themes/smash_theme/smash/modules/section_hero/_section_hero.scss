@@ -1,0 +1,37 @@
+.hero {
+    position: relative;
+    width: 100%;
+
+    .hero-image {
+        @include flex(row, end, start);
+        width: 100%;
+        min-height: 385px;
+        padding: 40px;
+
+        .hero-body {
+            background: $overlay_white;
+            text-align: center;
+            padding: 1em;
+
+            .hero-text {
+                padding: 10px 0 20px;
+            }
+
+            .hero-btn {
+                @extend %bg_link;
+            }
+        }
+    }
+
+    @include respond-to(large, max) { 
+        padding: 50px 40px 30px;
+    }
+
+    @include respond-to(medium, max) { 
+        padding: 50px 20px;
+
+        .hero-image {
+            padding: 50px 30px;
+        }
+    }
+}

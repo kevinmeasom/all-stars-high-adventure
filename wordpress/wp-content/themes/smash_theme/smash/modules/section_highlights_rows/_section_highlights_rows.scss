@@ -1,0 +1,82 @@
+.highlights-rows {
+    position: relative;
+    padding-top: 50px;
+
+    .highlights-rows-container {
+        @include flex(col, center, center);
+
+        .shop-highlights {
+            width: 100%;
+        }
+    }
+
+    .shop-highlights {
+
+        .shop-highlights-inner {
+            .shop-highlights-wrapper {
+                .shop-highlights-body {
+                    .shop-highlights-products {
+                        .product {
+                            width: 50%;
+                        }
+                    }
+                }
+            }
+        }
+
+        &:nth-child(2n){
+            .shop-highlights-inner {
+                .shop-highlights-wrapper {
+                    @include flex(row, center, between);
+                    
+                    .shop-highlights-body {
+                        @include flex(col, center, center);
+                        width: 65%;
+                        margin-right: -20px;
+                        padding-left: 65px;
+                    }
+
+                    @include respond-to(medium, max) {
+                        flex-direction: column !important;
+
+                        .shop-highlights-body {
+                            width: 100%;
+                            margin-right: 0;
+                            margin-left: 0;
+                            padding-right: 0;
+                            padding-left: 0;
+                        }
+                    }
+                }
+            }
+        }
+        &:nth-child(2n+1){
+            .shop-highlights-inner {
+                .shop-highlights-wrapper {
+                    @include flex(row-rev, center, between);
+
+                    .shop-highlights-body {
+                        @include flex(col, center, center);
+                        width: 65%;
+                        margin-right: unset;
+                        padding-left: unset;
+                        margin-left: -20px;
+                        padding-right: 65px;
+                    }
+
+                    @include respond-to(medium, max) {
+                        flex-direction: column !important;
+
+                        .shop-highlights-body {
+                            width: 100%;
+                            margin-right: 0;
+                            margin-left: 0;
+                            padding-right: 0;
+                            padding-left: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,19 @@
+.featured-video {
+    position: relative;
+    padding: 50px;
+
+    .featured-video-container {
+        @extend %container_lg;
+        @include flex(col, center, center);
+        text-align: center;
+        row-gap: 30px;
+
+        .featured-video-text {
+            margin-bottom: 30px;
+        }
+
+        .video-block {
+            width: 100%;
+        }
+    }
+}

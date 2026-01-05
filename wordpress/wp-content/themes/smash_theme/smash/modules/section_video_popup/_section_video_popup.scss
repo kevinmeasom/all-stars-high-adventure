@@ -1,0 +1,54 @@
+.video-popup-pre {
+    position: relative;
+    padding: 50px;
+
+    .video-popup-pre-container {
+        @extend %container_sm;
+        @include flex(col, center, center);
+        text-align: center;
+        row-gap: 20px;
+
+        .video-popup-pre-cta {
+            @extend %btn-primary;
+        }
+    }
+}
+.popup-video {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100000;
+    background: $overlay_black;
+
+    .popup-video-inner {
+        @include flex(row, center, center);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        .popup-video-container {
+            @extend %container_md;
+            position: relative;
+            padding: 30px;
+
+            .popup-video-close {
+                @extend %btn-secondary;
+                @include flex(row, center, center);
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: 5px !important;
+                z-index: 1;
+            }
+
+            .embed-container {
+                width: 100%;
+            }
+        }
+    }
+}

@@ -1,0 +1,88 @@
+#ltki_wrapper {
+    position: relative;
+    background: $bg_color;
+    padding: 50px;
+    margin: 50px 0;
+
+    .ltki-container { 
+        @include flex(col, center, center);
+        
+        .ltki-header {
+            @include flex(row, center, between);
+            width: 100%;
+
+            .ltki-header-col {
+                @include flex(col, start, center);
+
+                h3.ltki-title {
+                    font-size: 28px;
+                    margin-bottom: 0;
+                }
+
+                h3.ltki-subtitle {
+                    font-family: $font_title;
+                    letter-spacing: 1px;
+                    font-size: 11px;
+                    font-style: italic;
+                    margin-top: -10px;
+                }
+            }
+
+            .ltki-handle {
+                @extend %sub_link;
+            }
+        }
+
+        .ltki-feed {
+            width: 100%;
+            
+            @include respond-to(large, max){
+                display: none;
+            }
+        }
+
+        .ltki-feed-mobile {
+            width: 100%;
+            display: none;
+
+            @include respond-to(large, max){
+                display: block;
+            }
+        }
+
+        .ltki-cta {
+            @extend %sub_link;
+        }
+    }
+
+
+    @include respond-to(xlarge, max) { 
+        margin: 0;
+        padding: 20px 40px;
+    }
+
+    @include respond-to(medium, max) { 
+        padding: 30px 20px;
+
+        .ltki-container {
+            .ltki-header {
+                flex-direction: column !important;
+
+                .ltki-header-col {
+                    h3.ltki-subtitle {
+                        text-align: center;
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+#rs-ltk-widget-2-wrapper #rs-ltk-widget-2-extra-style-wrapper .rs-ltk-content-frame-wrapper .rs-ltk-widget-content-wrapper .rs-ltk-content-wrapper .rs-ltk-wrapper .rs-ltk-image {
+    background-color: white !important;
+
+    &:hover {
+        background-color: white !important;
+    }
+}

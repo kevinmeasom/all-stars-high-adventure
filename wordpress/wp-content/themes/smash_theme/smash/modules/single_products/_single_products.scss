@@ -1,0 +1,37 @@
+.post-product-slider-wrap {
+    text-align: center;
+
+    .slick-arrow {
+        &.slick-prev {
+            left: unset;
+            right: -4%;
+            top: 48%;
+        }
+        &.slick-next {
+            left: unset;
+            right: -4%;
+            top: 39%;
+        }
+    }
+
+    .post-product-slider {
+        img {
+            margin: 0 auto;
+        }
+
+        .slick-arrow {
+            position: absolute;
+            top: 50%;
+            font-size: 24px;
+            color: #000000;
+
+            &.slick-prev {
+                left: -10%;
+            }
+            
+            &.slick-next {
+                right: -10%;
+            }
+        }
+    }
+}

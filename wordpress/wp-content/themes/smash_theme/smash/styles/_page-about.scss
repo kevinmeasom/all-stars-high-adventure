@@ -1,0 +1,100 @@
+#about_page {
+
+    .about-outer {
+        background: $bg_color;
+        padding: 50px;
+        margin-bottom: 10%;
+        
+        .about-inner {
+            @include flex(row, center, center);
+            
+            .about-images {
+                @include flex(row, end, center);
+                flex: 1;
+                margin-bottom: -10%;
+    
+                .about-image-main {
+                    width: 82%;
+                    border: 10px solid white;
+                }
+    
+                .about-image-side {
+                    position: relative;
+                    width: 43%;
+                    margin-left: -25%;
+                    margin-bottom: -30px;
+                    border: 10px solid white;
+                }
+            }
+    
+            .about-body {
+                @include flex(col, center, center);
+                flex: 1;
+                padding: 50px;
+    
+                .page-title {
+                    text-align: left;
+    
+                    span {
+                        color: $accent_color;
+                    }
+                }
+            }
+        }
+    }
+
+    .about-content {
+        @extend %container_lg;
+    }
+
+
+    #about_main {
+
+        .stacked-images {
+            width: $half;
+            height: 665px;
+
+            .stacked-half {
+                max-width: 325px;
+                margin-right: -15%;
+            }
+        }
+
+        .loop-main-content {
+            width: 42%;
+            padding: $pad;
+        }
+    }
+
+    
+    @include respond-to(large, max) {
+        
+        #about_main {
+            flex-direction: column;
+
+            .stacked-images{
+                width: 75%;
+                height: 565px;
+
+                .stacked-half{
+                    // max-width: 275px;
+                    // margin-right: -9%;
+                    display: none;
+                }
+            }
+
+            .loop-main-content{
+                width: 80%;
+                padding: 30px;
+            }
+        }
+    }
+    
+    @include respond-to(medium, max) {
+        
+    }
+    @include respond-to(small, max) {
+        
+    }
+
+}

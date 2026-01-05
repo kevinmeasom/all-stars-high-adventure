@@ -1,0 +1,30 @@
+.content-rows {
+    position: relative;
+    padding: 0 50px;
+
+    .content-row {
+        column-gap: 2em;
+        padding: 50px 0;
+
+        .content-row-image {
+            flex: 1;
+        }
+
+        .content-row-body {
+            @include flex(col, start, center);
+            row-gap: 2em;
+            flex: 1;
+
+            .content-row-cta {
+                @extend %btn-primary;
+            }
+        }
+
+        &:nth-child(2n+1){
+            @include flex(row, center, center);
+        }
+        &:nth-child(2n){
+            @include flex(row-rev, center, center);
+        }
+    }
+}

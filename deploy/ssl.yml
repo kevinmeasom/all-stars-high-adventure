@@ -1,0 +1,39 @@
+---
+- name: Restart nginx
+  service: name=nginx state=restarted
+  tags: [ ssl, restart-nginx ]
+
+# Let's Encrypt SSL
+- name: Certbot SSL (issue certificate only, don't modify nginx)
+  command: >
+    certbot certonly --nginx -n
+    -d {{ http_host }} -d {{ http_secondary }}
+    -m {{ letsencrypt_email }}
+    --agree-tos --keep-until-expiring --expand
+  when: (env == "production") and http_prot == "https"
+  notify: Reload Nginx
+  tags: [ ssl ]
+
+- name: Add letsencrypt cronjob for cert renewal
+  cron:
+    name: letsencrypt_renewal
+    special_time: weekly
+    job: certbot renew --post-hook "systemctl reload nginx"
+  when: (env == "production") and http_prot == "https"
+  notify: Reload Nginx
+  tags: [ ssl ]
+
+- name: Sets SSL Nginx conf file
+  template:
+    src: "files/nginx-{{ env }}-ssl.conf.j2"
+    dest: "/etc/nginx/sites-available/{{ http_conf }}"
+  notify: Reload Nginx
+  tags: [ nginx ]
+
+- name: Enables new site
+  file:
+    src: "/etc/nginx/sites-available/{{ http_conf }}"
+    dest: "/etc/nginx/sites-enabled/{{ http_conf }}"
+    state: link
+  notify: Reload Nginx
+  tags: [ nginx ]

@@ -1,0 +1,117 @@
+#gallery-photos {
+    padding: 50px 0;
+    max-width: 97.5%;
+    margin-left: 8px;
+
+    .gallery-container {
+        @extend %container_xl;
+        @include flex(col, center, center);
+        row-gap: 2em;
+        text-align: center;
+
+        .gallery-cta {
+            @extend %btn-primary;
+        }
+    }
+    
+    .grid {
+        @include flex(wrap, start, center);
+        transform: translate(1%, 0);
+
+        .grid-sizer,
+        .grid-item {
+            @include flex(col, center, center);
+            width: 33%;
+            padding: 0 10px 20px;
+
+            .gallery-image-inner {
+                position: relative;
+                overflow: hidden;
+
+                img {
+                    @extend %ease;
+                }
+            }
+
+            &:hover {
+                .gallery-image-inner {
+                    img {
+                        transform: scale(1.1);
+                        -webkit-filter: grayscale(1);
+                    }
+                }
+            }
+            
+            @include respond-to(large, max){
+                width: $half;    
+            }
+        }
+    }
+    
+    @include respond-to(large, max){
+        padding: 0;
+    }
+}
+
+body.swiper #swipebox-overlay {
+    z-index: 100001 !important;
+    background: $overlay_accent;
+
+    #swipebox-top-bar {
+        transform: translate3d(0,50px,0) !important;
+    }
+
+    #swipebox-title {
+        font-size: 22px;
+        font-family: "Calgary", sans-serif;
+        padding: 3px 0 0 10px;
+
+        @include respond-to(medium, max){
+            font-size: 18px;
+            text-align: left;
+        }
+    }
+
+    #swipebox-bottom-bar, #swipebox-top-bar {
+        background: rgba(0,0,0,0.25);
+    }
+
+    #swipebox-slider .slide img {
+        max-width: 80%;
+    }
+
+    #swipebox-close {
+        background-color: rgba(0,0,0,0.25);
+    }
+}
+.wall {
+    columns:3;
+    column-gap: 1.75em;
+}
+.brick {
+    margin-bottom:1.75em;
+    /* No cross browser 'break-inside' property being supported yet: */
+    display:inline-block;
+}
+
+#gallery-photos {
+    padding: 50px 0;
+}
+
+@include respond-to(xlarge, max) {
+    .gallery-container.wall {
+        columns: 3;
+    }
+}
+
+@include respond-to(large, max) {
+    .gallery-container.wall {
+        columns: 2;
+    }
+}
+
+@include respond-to(medium, max) {
+    .gallery-container.wall {
+        columns: 1;
+    }
+}

@@ -1,0 +1,72 @@
+.cta-blocks {
+    position: relative;
+    padding: 1em;
+
+    .cta-blocks-container {
+        @include flex(wrap, null, between);
+        column-gap: 1em;
+        row-gap: 1em;
+
+        .cta-block {
+            @include flex(col, center, between);
+            flex: 1;
+
+            .cta-block-inner {
+                @include flex(col, center, betweem);
+                flex: 1;
+                position: relative;
+                width: 100%;
+                padding: 20px;
+                
+                .cta-block-body {
+                    @include flex(col, center, between);
+                    flex: 1;
+                    position: relative;
+                    text-align: center;
+                    z-index: 2;
+                    row-gap: 20px;
+                    color: $secondary_color;
+
+                    .cta-block-text {
+                        flex: 1;
+                        margin-bottom: 20px;
+                    }
+
+                    .cta-block-cta {
+                        @extend %btn-secondary;
+                    }
+                }
+
+                &::after {
+                    content: '';
+                    display: block;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 1;
+                    background: $bg_color_3;
+                }
+            }
+        }
+        
+        @include respond-to(xlarge, max){
+            display: grid !important;
+            @include grid(1fr 1fr, auto, 1em, 1em);
+
+            .cta-block {
+                height: 100%;
+            }
+        }
+       
+        @include respond-to(medium, max){
+            display: grid !important;
+            @include grid(1fr, auto, 1em, 1em);
+
+            .cta-block {
+                height: unset;
+            }
+        }
+    }
+}

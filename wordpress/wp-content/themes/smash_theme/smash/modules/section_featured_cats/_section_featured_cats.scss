@@ -1,0 +1,72 @@
+/*--------------------------------------------------------------
+## Featured Categories
+--------------------------------------------------------------*/
+#featured_cats {
+    position: relative;
+    margin: 50px;
+    padding-top: 50px;
+    border-top: 1px solid $line_color;
+
+    .featured-cats-title {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .featured-cats-container {
+        @include flex(row, null, center);
+
+        .featured-cat {
+            flex: 1;
+            padding: 10px;
+
+            .featured-cat-image {
+                @include flex(col, center, center);
+                width: 100%;
+                padding: 50px;
+                height: 350px !important;
+            }
+        }
+    }
+
+    @include respond-to(xxlarge, max) { 
+        .featured-cats-container {
+            .featured-cat {
+                .featured-cat-image {
+                    padding: 0px;
+                    height: 230px !important;
+                }
+            }
+        }
+    }
+
+    @include respond-to(xlarge, max) { 
+        margin: 50px 30px;
+
+        .featured-cats-container {
+            .featured-cat {
+                padding: 7px;
+                .featured-cat-image {
+                    height: 200px !important;
+
+                    a.featured-cat-title {
+                        padding: 11px 16px !important;
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max) { 
+        margin: 50px 30px;
+
+        .featured-cats-container {
+            flex-wrap: wrap !important;
+            display: flex;
+
+            .featured-cat {
+                width: 50%;
+                flex: auto;
+            }
+        }
+    }
+}

@@ -1,0 +1,152 @@
+.shop-masonry-links-wrapper {
+    position: relative;
+    padding: 50px;
+
+    .shop-masonry-links-container {
+        @extend %container_xl;
+
+        .shop-masonry-links {
+            @include flex(wrap, start, between);
+            width: 100%;
+
+            .shop-masonry-link {
+                @include flex(col, center, end);
+                position: relative;
+
+                .shop-masonry-link-image {
+                    width: 100%;
+
+                    &:hover {
+                        opacity: 0.85;
+                    }
+                }
+
+                .shop-masonry-link-text {
+                    @include flex(row, center, center);
+                    background: $secondary_color;
+                    width: 100%;
+                    text-align: left;
+                    padding: 5px 10px;
+                    font-family: $font_title;
+                    font-size: 16px;
+                    letter-spacing: 1px;
+
+                    .icon {
+                        @extend %btn-primary;
+                        padding: 7px !important;
+                        margin-left: 10px !important;
+                        width: 30px;
+                        //to give icons precendence in div - otherwise they will shrink if width is restricted
+                        min-width: 30px;
+                        height: 30px;
+                        border-radius: 100%;
+                    }
+                }
+
+                @include respond-to(xxlarge, max){
+                    .shop-masonry-link-text {
+                        font-size: 13px;
+                    }
+                } 
+            }
+
+            .shop-masonry-links-grid {
+                @include flex(wrap, null, end);
+                width: 56%;
+
+                .shop-masonry-link {
+                    padding: 0 2%;
+                    margin-bottom: 20px;
+                    width: 33.3%;
+
+                    .shop-masonry-link-text {
+                        p {
+                            margin: 0;
+                        }
+                    }
+
+                    &:nth-child(1),
+                    &:nth-child(2){
+                        @include flex(col, center, end);
+                        width: 50%;
+
+                        .shop-masonry-link-text {
+                            position: absolute;
+                            bottom: 0;
+                            width: auto;
+                            max-width: 65%;
+                        }
+
+                        @include respond-to(medium, max){ 
+                            width: 100%;
+                        }
+                    }
+
+                    @include respond-to(medium, max){ 
+                        width: 100%;
+                    }
+                }
+            }
+
+            & > * {
+                &:first-child {
+                    @include flex(col, start, start);
+                    width: 43%;
+
+                    .shop-masonry-link-text {
+                        position: absolute;
+                        top: 20px;
+                        width: auto;
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(xxlarge, max){ 
+        padding: 50px 35px;
+    }
+
+    @include respond-to(xlarge, max){ 
+        padding: 50px 25px;
+
+        .shop-masonry-links-container {
+            .shop-masonry-links {
+                flex-direction: column !important;
+
+                .shop-masonry-links-grid {
+                    width: 100%;
+                }
+
+                & > * {
+                    &:first-child {
+                        width: 100%;
+                        margin-bottom: 30px;
+                        padding: 0 14px
+                    }
+                }
+                
+                
+            }
+        }
+    }
+
+    @include respond-to(medium, max){ 
+        .shop-masonry-links-container {
+            .shop-masonry-links {
+
+                & > * {
+                    &:first-child {
+                        padding: 0 6px;
+                    }
+                }
+                
+                
+            }
+        }
+    }
+}
+
+.grid {
+    transform: translate(1%, 0);
+}

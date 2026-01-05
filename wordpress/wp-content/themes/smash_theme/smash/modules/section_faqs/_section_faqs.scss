@@ -1,0 +1,117 @@
+#faq-module {
+    background: $secondary_color;
+    padding: 70px 50px;
+
+    .page-faq-header {
+
+        .page-faq-title {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            font-size: 40px;
+        }
+        
+        .page-faq-header-inner {
+            @include flex(row, center, center);
+        }
+    }
+
+    .page-faq-footer {
+        @extend %container_xl;
+        @include flex(row, center, center);
+        padding-top: 30px;
+
+        .page-faq-cta {
+            @extend %btn-primary;
+        }
+    }
+    
+    .page-faq-wrapper {
+        @include flex(row, start, between);
+        position: relative;
+        
+        .faq-col {
+            width: 48%;
+    
+            .faq-item {
+                background: $secondary_color;
+                border: 1px solid $bg_color;
+                margin-bottom: 23px;
+    
+                .faq-title {
+                    text-align: left;
+                    margin-bottom: 0;
+                    padding: 10px;
+                    font-size: 16px;
+                    color: #4D4D4D;
+
+                    span {
+                        width: 90%;
+                    }
+
+                    .icon {
+                        width: 25px;
+                        height: 25px;
+                        padding: 5px;
+                        cursor: pointer;
+                    }
+                }
+                
+                .faq-text {
+                    display: none;
+                    text-align: left;
+                    padding: 0 10px 10px;
+                }
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
+    &.has-bg {
+        background: $bg_color;
+        margin: 30px 0;
+    }
+
+    @include respond-to(xlarge, max) {
+        padding: 70px 40px 30px;
+
+        .page-faq-header {
+            .page-faq-title {
+                text-align: center;
+                font-size: 40px;
+            }
+        }
+        .page-faq-wrapper {
+            @include flex(col, center, start);
+
+            .faq-col {
+                width: 100%;
+
+                .faq-item {
+            
+                    .faq-title {
+                        font-size: 14px;
+                    }
+
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max) {
+        padding: 80px 30px 30px;
+
+        .page-faq-header {
+            .page-faq-title {
+                text-align: center;
+            }
+        }
+    }
+}
+
+
+
+
+

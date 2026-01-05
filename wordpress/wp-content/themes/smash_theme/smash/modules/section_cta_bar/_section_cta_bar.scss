@@ -1,0 +1,34 @@
+.cta-bar {
+    @include flex(wrap, center, center);
+    column-gap: 2em;
+    row-gap: 1em;
+    position: relative;
+    padding: 75px 50px;
+    background: $bg_color;
+    text-align: center;
+    width: 100%;
+
+    .cta-bar-title {
+        font-size: $h1;
+
+        @include respond-to(xlarge, max){
+            font-size: $h2;
+        }
+        
+        @include respond-to(large, max){
+            font-size: $h3;
+        }
+        
+        @include respond-to(medium, max){
+            font-size: $h4;
+        }
+    }
+
+    .cta-bar-cta {
+        @extend %btn-primary;
+    }
+
+    @include respond-to(large, max){
+        padding: 50px 30px;
+    }   
+}

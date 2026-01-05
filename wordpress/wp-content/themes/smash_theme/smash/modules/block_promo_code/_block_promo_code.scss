@@ -1,0 +1,20 @@
+.promo-code {
+    width: 22%;
+
+    .promo-code-inner {
+        @include flex(col, center, between);
+        width: 100%;
+        text-align: center;
+        row-gap: 1em;
+
+        .promo-code-image-wrap {
+            width: 100%;
+            border: 1px solid $line_color;
+            padding: 15px;
+        }
+
+        .promo-code-link {
+            @extend %btn-primary;
+        }
+    }
+}

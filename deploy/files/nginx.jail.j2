@@ -1,0 +1,8 @@
+[nginx-http-get-dos]
+enabled  = true
+port     = http,https
+filter   = nginx-http-get-dos
+logpath  = /var/log/nginx/access.log
+maxretry = 100
+findtime = 300
+bantime  = 3600

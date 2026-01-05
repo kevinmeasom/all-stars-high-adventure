@@ -1,0 +1,25 @@
+.snapshot {
+
+    .post-item-image-wrap {
+        position: relative;
+        width: 100%;
+        
+        .post-item-image {
+            display: block;
+            width: 100%;
+        }
+    }
+
+    .snapshot-body {
+        @include flex(col, center, center);
+        margin-top: 20px;
+
+        .snapshot-title {
+            text-align: center;
+        }
+
+        .snapshot-link {
+            @extend %btn-primary;
+        }
+    }
+}

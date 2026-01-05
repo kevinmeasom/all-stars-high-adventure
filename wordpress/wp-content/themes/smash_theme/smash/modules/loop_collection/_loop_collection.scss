@@ -1,0 +1,165 @@
+.posts-collection {
+    position: relative;
+    padding: 50px;
+
+    .posts-collection-container {
+        @extend %container_xl;
+        @include flex(row, center, center);
+
+        .collection-post-main {
+            @include flex(row, center, center);
+            flex: 3;
+
+            .collection-post-main-body {
+                position: relative;
+                width: 60%;
+                margin-right: -20%;
+                overflow: hidden;
+                padding-left: 25px;
+                
+                .collection-post-main-body-inner {
+                    position: relative;
+                    width: 94%;
+                    background: $bg_color;
+                    border: 2px solid $accent_color;
+                    padding: 60px;
+
+                    a.collection-post-main-cat {
+                        text-transform: uppercase;
+                        font-family: $font_nav2;
+                        letter-spacing: 1px;
+                        font-size: 12px;
+                    }
+
+                    h2 {
+                        font-size: 40px;
+                        line-height: 44px;
+                        margin: 20px 0;
+
+                        @include respond-to(xxlarge, max) {
+                            font-size: 25px;
+                            line-height: 36px;
+                            margin: 20px 0;
+                        }
+                    }
+
+                    .collection-post-main-text {
+                        font-size: 15px;
+                        margin-bottom: 20px;
+                        line-height: 25px;
+                    }
+
+                    a.collection-post-main-link {
+                        @extend %btn-primary;
+                    }
+
+                    .post-products-wrap {
+
+                        .post-products-trigger {
+                            @extend %btn-primary;
+                            @include flex(row, center, center);
+                            top: 25px;
+                            left: -25px;
+                            width: 50px;
+                            height: 50px;
+                            padding: 0 !important;
+                            border-radius: 100%;
+                        }
+    
+                        .post-products {
+                            top: 0;
+                            bottom: unset;
+                            right: 115%;
+                            left: unset;
+                        }
+    
+                        &:hover {
+                            .post-products {
+                                right: 0;
+                            }
+                        }
+                    }
+
+                    @include respond-to(xlarge, max) {
+                        width: 85%;
+                        padding: 40px;
+                    }
+                }
+            }
+            .collection-post-main-image {
+                width: 64%;
+            }
+        }
+
+        .posts-collection-posts-side {
+            flex: 1;
+            padding: 0 0 0 40px;
+
+            .collection-post {
+                border-bottom: 1px solid $accent_color;
+                padding: 10px 0;
+                margin-bottom: 20px;
+                text-transform: uppercase;
+                font-family: $font_nav2;
+                letter-spacing: 1px;
+                font-size: 12px;
+
+                h4 {
+                    font-size: 22px;
+
+                    @include respond-to(xxlarge, max) {
+                        font-size: 17px;
+                    }
+                }
+            }
+
+            @include respond-to(xlarge, max) {
+                width: 98%;
+            }
+
+            @include respond-to(medium, max) {
+                padding: 0;
+                width: 91%;
+            }
+
+        }
+    }
+
+    @include respond-to(xxlarge, max) {
+        padding: 50px 30px 50px 20px;
+    }
+
+    @include respond-to(xlarge, max) {
+        .posts-collection-container {
+            flex-direction: column !important;
+        }
+    }
+
+    @include respond-to(medium, max) {
+        padding: 30px;
+        
+        .posts-collection-container {
+            .collection-post-main {
+                flex-direction: column-reverse !important;
+
+                .collection-post-main-image {
+                    width: 100%;
+                }
+
+                .collection-post-main-body {
+                    width: 100%;
+                    margin-right: 0%;
+                    margin-right: 25px;
+                    margin-top: -60px;
+                    margin-bottom: 30px;
+
+                    .collection-post-main-body-inner{
+                        width: 100%;
+                        padding: 20px;
+                    }
+                }
+            }
+        }
+    }
+
+}

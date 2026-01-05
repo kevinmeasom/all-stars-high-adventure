@@ -1,0 +1,16 @@
+#System Files
+.DS_Store
+.config.json
+docker-compose.yml
+
+# WordPress
+*.log
+!/wordpress/wp-content/uploads
+/wordpress/wp-content/uploads/*
+!/wordpress/wp-content/uploads/alm_templates
+!/wordpress/wp-content/uploads/sb-instagram-feed-images
+!/wordpress/wp-content/uploads/wp-migrate-db
+/wordpress/wp-content/themes/**/.sass-cache
+/wordpress/wp-content/plugins/**/*.log
+/wordpress/wp-content/ewww/debug.log
+

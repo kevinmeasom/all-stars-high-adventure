@@ -1,0 +1,22 @@
+.featured-ctas {
+    position: relative;
+    padding: 50px;
+
+    .featured-ctas-container {
+        @extend %container_xl;
+        @include flex(row, center, center);
+
+        .featured-ctas-title {
+            margin: 0 50px 0 0;
+        }
+
+        .featured-ctas-wrapper {
+            @include flex(wrap, center, center);
+            width: 100%;
+
+            .featured-cta {
+                margin: 10px;
+            }
+        }
+    }
+}

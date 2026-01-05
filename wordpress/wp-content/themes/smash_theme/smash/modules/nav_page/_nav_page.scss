@@ -1,0 +1,291 @@
+.page-nav {   
+    @include flex(col, center, center);
+    margin-bottom: 30px;
+
+    .page-menu-container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    h2.page-nav-title {
+        text-transform: capitalize;
+        font-size: 30px;
+        letter-spacing: 2px;
+        font-family: $font-title;
+    }
+
+    .page-nav-text {
+        text-align: center;
+        
+        @include respond-to(large, max){
+            display: none;
+        }
+    }
+
+    form {
+        width: 100%;
+        max-width: 480px;
+        margin: 10px 0;
+
+        .search-fields {
+            position: relative;
+            @include flex(row, center, center);
+            
+            input {
+                width: 100%;
+                font-size: 12px;
+                letter-spacing: 1px;
+                font-family: $font-title;
+            }
+
+            button {
+                position: absolute;
+                right: 10px;
+            }
+
+            @include respond-to(medium, max) {
+                max-width: 90%;
+                margin: 0 auto;
+            }   
+        }
+    }
+
+    .page-menu {
+        @extend %nav;
+        @include flex(wrap, center, center);
+        font-family: $font_nav;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+        margin: 10px 0 30px;
+
+        ul {
+            padding: 5px 0px;
+        }
+
+        li {
+            text-align: left;
+
+            &.current-menu-item {
+                border-bottom: 2px solid $link_color;
+
+                @include respond-to(large, max){
+                    border-bottom: 1px solid #eeeeee;
+                }
+            }
+
+            a {
+               @extend %alt_link;
+            }
+
+            .sub-menu {
+                margin: 0;
+                padding: 0;
+                list-style-position: inside;
+            }
+        }
+
+        
+        @include respond-to(large, max){
+            @include flex(col, center, center);
+            font-size: 11px;
+            letter-spacing: 1px;
+            width: 100%;
+          
+            .menu-item {
+                    width: 100%;
+                    padding: 12px 20px;
+                    border-bottom: 1px solid #eeeeee;
+    
+                    .menu-drop {
+                        @include flex(row, center, between);
+    
+                        .icon {
+                            margin-left: 10px;
+                        }
+                    }
+    
+                    &.menu-item-has-children {
+                        .sub-menu {
+                            position: relative;
+                            display: none;
+                            opacity: 0;
+                            visibility: hidden;
+                            transform: unset;
+                            background: unset;
+                            padding: unset;
+                            padding-left: 10px;
+    
+                            li {
+                                margin-bottom: 0;
+                                border-bottom: unset;
+                            }
+                        }
+    
+                        &.show {
+                            .sub-menu {
+                                @include flex(col, start, start);
+                                opacity: 1;
+                                visibility: visible;
+                            }
+                        }
+                    }
+    
+                    a {
+                        display: block;
+                    }
+                    
+                    &.light-menu-item {
+                        font-weight: 100;
+                    }
+                }
+        }
+    }
+
+    .page-nav-title {
+
+        .icon {
+            display: none;
+        }
+
+        @include respond-to(large, max){
+            &.center {
+                @include flex(row, center, center);
+            }
+            &.between {
+                @include flex(row, center, between);
+            }
+            font-family: $font_body;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            padding: 12px 20px;
+            text-align: center;
+        }
+    }
+
+    &.btns {
+        @include flex(row, center, center);
+        background: $bg_color;
+        padding: 20px 50px;
+        margin-bottom: 50px;
+
+        .page-nav-title {
+            margin: 0;
+            max-width: 300px;
+            text-align: center;
+
+            @include respond-to(xlarge, max){
+                max-width: 100%;
+                padding-bottom: 0;
+                justify-content: center !important;
+            }
+        }
+
+        .page-menu-container {
+            width: auto;
+
+            .page-menu {
+                margin: 0;
+
+                li {
+
+                    a {
+                        @extend %btn-primary;
+                        width: 200px !important;
+                    }
+
+                    &.current-menu-item {
+                        border-bottom: unset;
+                    }
+                }
+            }
+        }
+    }
+
+    &.has-btns {
+        .page-menu-container {
+            .page-menu {
+                li {
+                    a {
+                        @extend %btn-primary;
+                    }
+                    &.current-menu-item {
+                        border-bottom: unset;
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(large, max){
+
+        &.btns {
+            @include flex(col, center, center);
+            padding: 20px;
+
+            .page-menu-container {
+                width: 100%;
+
+                .page-menu {
+                    @include flex(row, center, center);
+                    @include flex(wrap, center, center);
+                    width: 100%;
+                }
+            }
+        }
+
+        &.hide-mobile {
+            .page-menu {
+                .menu-item {
+                    width: fit-content;
+                    border-bottom: none;
+                }
+            }
+        }
+
+        &.show-mobile {
+            .page-nav-title {
+                order: 1;
+
+                &.center {
+                    @include flex(row, center, center);
+                }
+                &.between {
+                    @include flex(row, center, between);
+                }
+                font-family: $font_body;
+                font-size: 11px;
+                text-transform: uppercase;
+                text-align: left;
+                letter-spacing: 1px;
+                width: 100%;
+                padding: 12px 20px;
+                border-top: 1px solid #efefef;
+                border-bottom: 1px solid #efefef;
+    
+                .icon {
+                    display: block;
+                    margin-left: 10px;
+                }
+    
+                &.open {
+                    .icon {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+
+            .page-menu-container {
+                display: none;
+                order: 2;
+                padding: 0;
+            }
+
+            form {
+                order: 3;
+            }
+        }
+    }
+}

@@ -1,0 +1,55 @@
+#hello_bar {
+    display: none;
+    
+    .hello-bar-inner {
+        @include flex(row, null, center);
+        position: relative;
+        width: 100%;
+        background: $hello_bg;
+        color: $hello_text;
+        font-size: $button;
+        font-weight: 500;
+        min-height: 40px;
+
+        a {
+            @extend %link;
+        }
+        
+        .hello-bar-container {
+            @include flex(row, center, center);
+            width: 100%;
+            letter-spacing: 1px;
+    
+            .hello-bar-text {
+                margin-right: 5px;
+            }
+        }
+    
+        .hello-bar-close {
+            @extend %btn-primary;
+            @include flex(col, center, center);
+            position: absolute;
+            width: 50px;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+    
+            .icon {
+                width: 10px;
+                height: 10px;
+            }
+
+            &:hover {
+                cursor: pointer;
+                background: $hello_hover;
+            }
+        }
+    
+        @include respond-to(medium, max) { 
+            .hello-bar-container {
+                flex-direction: column !important;
+            }
+        }
+    }
+}

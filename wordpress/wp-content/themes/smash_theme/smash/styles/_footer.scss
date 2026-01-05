@@ -1,0 +1,24 @@
+#instagram_feed {
+    position: relative;
+
+    .instagram-header {
+        @extend %btn-primary;
+        position: absolute;
+        top: 46%;
+        left: 15%;
+        z-index: 1000;
+    }
+}
+
+#colophon {
+    @extend %footer;
+
+    #footer_menu_container {
+        margin: 0 10px;    
+    }
+
+    #footer_menu {
+        @extend %nav;
+        @include flex(row, center, center);
+    }
+}

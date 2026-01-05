@@ -1,0 +1,80 @@
+.map-wrapper {
+    position: relative;
+    padding: 50px;
+
+    .map-container {
+        @extend %container_xl;
+        @include flex(row, center, center);
+
+        .map-body {
+            @include flex(col, center, center);
+            width: 38%;
+            padding: 50px;
+            text-align: center;
+
+            .map-subtitle {
+                font-family: $font_script;
+                font-size: 40px;
+            }
+
+            .map-text {
+                margin: 20px 0;
+            }
+
+            .map-cta {
+                @extend %btn-primary;
+            }
+        }
+
+        .map-block {
+            width: 62%;
+        }
+    }
+
+    &.use-bg {
+        background: $bg_color;
+    }
+
+    &.stacked {
+        .map-container {
+            @include flex(col, center, center);
+
+            .map-body {
+                width: 100%;
+            }
+
+            .map-block {
+                width: 100%;
+            }
+        }       
+    }
+
+    @include respond-to(xlarge, max) { 
+        padding: 10px 30px 20px;
+
+        .map-container {
+            .map-body {
+                padding: 50px 10px;
+            }
+        }
+    }
+
+    @include respond-to(medium, max) { 
+        .map-container {
+            flex-direction: column !important;
+
+            .map-body {
+                width: 100%;
+                padding: 50px 0;
+            }
+
+            .map-block {
+                width: 100%;
+
+                .map-wrapper {
+                    padding: 20px 0 40px;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,51 @@
+.videos-section-wrapper {
+    position: relative;
+    padding: 50px;
+    background: $bg_color;
+
+    .videos-container {
+        @include flex(col, center, center);
+        row-gap: 50px;
+
+        & > * {
+            width: 100%;
+        }
+
+        .videos-header-wrapper {
+            .videos-header {
+                @include flex(row, center, center);
+
+                .videos-title {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        .videos-cta-wrapper {
+            @include flex(row, center, center);
+
+            .videos-cta {
+                @extend %btn-primary;
+            }
+        }
+
+        .videos-inner {
+            .videos-slider {
+                @extend %container_xl;
+
+                .slick-list {
+                    padding: 0 !important;
+                }
+
+                .video-block {
+                    width: 100%;
+                    padding: 10px;
+                    
+                    .embed-container {
+                        padding-bottom: 75%;
+                    }
+                }
+            }
+        }
+    }
+}

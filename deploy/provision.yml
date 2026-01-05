@@ -1,0 +1,382 @@
+---
+- hosts: all
+  become: true
+  become_flags: "--preserve-env=SSH_AUTH_SOCK"
+  vars_files:
+    - group_vars/all.yml
+    - group_vars/{{ env }}.yml
+
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400
+
+    - name: Install Prerequisites
+      apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
+      loop: [ 'aptitude' ]
+      tags: [ system ]
+
+    - name: Get vars
+      debug: "msg={{ http_host }}"
+
+    - name: Install LEMP Packages
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: [ 'nginx', 'fail2ban', 'mysql-server', 'python3-pip', 'python3-pymysql', 'python3-certbot-nginx', 'php-fpm', 'php-mysql', 'php-curl', 'php-soap', 'php-mbstring', 'php-imagick', 'php-intl', 'php-xml' ]
+      tags: [ system , packages]
+    
+# Nginx Configuration
+    - name: Sets Nginx conf file
+      template:
+        src: "files/nginx-{{ env }}.conf.j2"
+        dest: "/etc/nginx/sites-available/{{ http_conf }}"
+      notify: Reload Nginx
+      tags: [ nginx ]
+
+    - name: Enables new site
+      file:
+        src: "/etc/nginx/sites-available/{{ http_conf }}"
+        dest: "/etc/nginx/sites-enabled/{{ http_conf }}"
+        state: link
+      notify: Reload Nginx
+      tags: [ nginx ]
+    
+    - name: Removes "default" site
+      file:
+        path: "/etc/nginx/sites-enabled/default"
+        state: absent
+      notify: Reload Nginx
+      tags: [ nginx ]
+    
+    - name: Removes "default" site
+      file:
+        path: "/etc/nginx/sites-available/default"
+        state: absent
+      notify: Reload Nginx
+      tags: [ nginx ]
+   
+    - name: Setup frontend folders
+      file:
+        path: "/var/www/{{ http_host }}"
+        state: directory
+        mode: 755
+      notify: Reload Nginx
+      tags: [ nginx ]
+
+  # Fail2Ban Configuration
+    - name: Sets fail2ban file
+      template:
+        src: "files/fail2ban.local.j2"
+        dest: "/etc/fail2ban/fail2ban.local"
+        mode: 644
+      notify: restart fail2ban
+      tags: [ fail2ban ]
+    
+    - name: Sets jail file
+      template:
+        src: "files/jail.local.j2"
+        dest: "/etc/fail2ban/jail.local"
+        mode: 644
+      notify: restart fail2ban
+      tags: [ fail2ban ]
+    
+    - name: Sets wordpress filter file
+      template:
+        src: "files/wordpress.filter.j2"
+        dest: "/etc/fail2ban/filter.d/wordpress.conf"
+        mode: 644
+      notify: restart fail2ban
+      tags: [ fail2ban ]
+    
+    - name: Sets wordpress jail file
+      template:
+        src: "files/wordpress.jail.j2"
+        dest: "/etc/fail2ban/jail.d/wordpress.conf"
+        mode: 644
+      notify: restart fail2ban
+      tags: [ fail2ban ]
+    
+    - name: Sets nginx jail file
+      template:
+        src: "files/nginx.jail.j2"
+        dest: "/etc/fail2ban/jail.d/nginx.conf"
+        mode: 644
+      notify: restart fail2ban
+      tags: [ fail2ban ]
+
+    - name: ensure fail2ban starts on a fresh reboot
+      service:
+        name: fail2ban
+        state: started
+        enabled: yes
+
+  # php-fpm Configuration
+    - name: Sets php-fpm file
+      template:
+        src: "files/php.ini.j2"
+        dest: "/etc/php/8.3/fpm/php.ini"
+        mode: 644
+      notify: Reload php
+      tags: [ php-fpm ]
+
+  # MySQL Configuration
+    - name: Sets mysql.cnf file
+      template:
+        src: "files/mysql.cnf.j2"
+        dest: "/etc/mysql/mysql.cnf"
+        mode: 644
+      notify: Reload mysql
+      tags: [ mysql ]
+
+    - name: Sets the root password 
+      mysql_user: 
+        name: root 
+        password: "{{ mysql_root_password }}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+      ignore_errors: True
+      tags: [ mysql ]
+
+    - name: Removes all anonymous user accounts
+      mysql_user:
+        name: ''
+        host_all: yes
+        state: absent
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      tags: [ mysql ]
+
+    - name: Removes the MySQL test database
+      mysql_db: 
+        name: test 
+        state: absent
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      tags: [ mysql ]
+    
+    - name: Create WordPress databases
+      mysql_db:
+        name: '{{ item.db_name }}'
+        state: present
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      with_items:
+        - "{{ environments }}"
+      tags: [ wordpress-setup, mysql ]
+
+    - name: Create MySQL user for WordPress
+      mysql_user:
+        name: "{{ mysql_user }}"
+        password: "{{ mysql_password }}"
+        priv: "{{ item.db_name }}.*:ALL"
+        append_privs: 'yes'
+        state: present
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      with_items:
+        - "{{ environments }}"
+      tags: [ wordpress-setup, mysql ]
+
+  # UFW Configuration
+    - name: "UFW - Allow HTTP on port {{ http_port }}"
+      ufw:
+        rule: allow
+        port: "{{ http_port }}"
+        proto: tcp
+      tags: [ ufw ]
+
+  # WordPress Configuration
+    - name: Download and unpack latest WordPress
+      unarchive:
+        src: https://smashcreative.com/wordpress.tar.gz
+        dest: "/var/www/{{ http_host }}"
+        remote_src: yes
+        creates: "/var/www/{{ http_host }}/wordpress"
+      tags: [ wordpress, wordpress-download ]
+
+    - name: Set ownership
+      file:
+        path: "/var/www/{{ http_host }}"
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
+      tags: [ wordpress, wordpress-permissions ]
+
+    - name: Set permissions for directories
+      shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type d -exec chmod 750 {} \\;"
+      tags: [ wordpress, wordpress-permissions ]
+
+    - name: Set permissions for files
+      shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type f -exec chmod 640 {} \\;"
+      tags: [ wordpress, wordpress-permissions ]
+
+    - name: Set up wp-config
+      template:
+        src: "files/wp-config.php.j2"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
+      tags: [ wordpress ]
+
+    - name: Download WP-CLI
+      shell: curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+      tags: [ wordpress-setup ]
+
+    - name: Make WP-CLI executable
+      file:
+        path: /root/wp-cli.phar
+        mode: u=rwx,g=rx,o=rx
+      tags: [ wordpress-setup ]
+
+    - name: Move WP-CLI to /usr/local/bin/wp
+      command: mv /root/wp-cli.phar /usr/local/bin/wp
+      tags: [ wordpress-setup ]
+
+    - name: Check if WP is installed
+      command: wp core is-installed
+              --allow-root
+      args:
+        chdir: "/var/www/{{ http_host }}/wordpress"
+      ignore_errors: True
+      register: wp_installed
+      tags: [ wordpress-setup ]
+
+    - name: Install WP
+      command: wp core install
+              --allow-root
+              --url="{{ http_prot }}://{{ http_host }}"
+              --title="Wordpress Site"
+              --admin_user="{{ wp_admin_user }}"
+              --admin_password="{{ wp_admin_pw }}"
+              --admin_email="{{ wp_admin_email }}"
+      args:
+        chdir: "/var/www/{{ http_host }}/wordpress"
+      register: wp_install
+      when: wp_installed.rc == 1
+      tags: [ wordpress-setup ]
+    
+    - name: Clone project files
+      git:
+        repo: "{{ project_git_repo }}"
+        dest: "/var/www/{{ http_host }}/assets/"
+        version: "{{ project_branch }}"
+        accept_hostkey: yes
+        clone: yes
+        update: yes
+        force: yes
+      ignore_errors: true
+      no_log: true
+      register: assets_clone
+      when: wp_install.changed
+      tags: [ wordpress-setup, project-files, project-clone ]
+    
+    - name: Copy plugins
+      become: true 
+      copy:
+        src: "/var/www/{{ http_host }}/assets/wordpress/wp-content/plugins"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-content/"
+        remote_src: yes
+        owner: www-data
+        group: www-data        
+        mode: 0750
+      when: assets_clone.changed
+      tags: [ wordpress-setup, project-files, project-plugins ]
+    
+    - name: Copy theme
+      become: true 
+      copy:
+        src: "/var/www/{{ http_host }}/assets/wordpress/wp-content/themes/{{ project_theme }}"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-content/themes/"
+        remote_src: yes
+        owner: www-data
+        group: www-data        
+        mode: 0750
+      when: assets_clone.changed
+      tags: [ wordpress-setup, project-files, project-theme ]
+
+    - name: Copy uploads
+      become: true 
+      copy:
+        src: "/var/www/{{ http_host }}/assets/wordpress/wp-content/uploads/"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-content/uploads/"
+        remote_src: yes
+        owner: www-data
+        group: www-data        
+        mode: 0750
+      when: assets_clone.changed
+      tags: [ wordpress-setup, project-files, project-uploads ]
+    
+    - name: Remove temp assets folder
+      become: true 
+      file:
+        path: "/var/www/{{ http_host }}/assets"
+        state: absent
+      when: assets_clone.changed
+      tags: [ wordpress-setup, project-files, project-cleanup ]
+    
+    - name: Activate wp-migrate-db-pro
+      command: wp plugin activate wp-migrate-db-pro --allow-root
+      args:
+        chdir: "/var/www/{{ http_host }}/wordpress"
+      tags: [ wordpress-setup ]
+
+    - name: Add wp-migrate-db-pro license
+      command: wp migratedb setting update license --user={{ wp_admin_user }} {{ wp_migrate_db_key }} --allow-root
+      args:
+        chdir: "/var/www/{{ http_host }}/wordpress"
+      tags: [ wordpress-setup ]
+
+    - name: Enable Pull Requests
+      command: wp migratedb setting update pull on --user={{ wp_admin_user }} --allow-root
+      args:
+        chdir: "/var/www/{{ http_host }}/wordpress"
+      tags: [ wordpress-setup ]
+
+    - name: Enable Push Requests
+      command: wp migratedb setting update push on --user={{ wp_admin_user }} --allow-root
+      args:
+        chdir: "/var/www/{{ http_host }}/wordpress"
+      tags: [ wordpress-setup ]
+
+  # Sets Up PHP Info Page
+    - name: Sets Up PHP Info Page
+      template:
+        src: "files/info.php.j2"
+        dest: "/var/www/html/info.php"      
+      tags: [ wordpress-setup ]
+
+  #Let's Encrypt SSL
+    - name: Include SSL Tasks
+      include_tasks: ssl.yml
+      when: (env == "production") and http_prot == "https"
+      tags: [ ssl ]
+    
+  #Nginx Restart
+    - name: Restart nginx
+      service: name=nginx state=restarted
+      tags: [ restart-nginx ]
+
+  handlers:
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: restart fail2ban
+      service: 
+        name: fail2ban
+        state: restarted
+    
+    - name: Reload php
+      service:
+        name: php8.3-fpm
+        state: restarted
+    
+    - name: Reload mysql
+      service:
+        name: mysql
+        state: restarted

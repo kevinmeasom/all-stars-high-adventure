@@ -1,0 +1,58 @@
+.video-block {
+    position: relative;
+
+    .video-block-container {
+
+        .video-block-wrap {
+            position: relative;
+            width: 100%;
+
+            .video-block-image {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 2;
+
+                .video-block-image-inner {
+                    @include flex(row, center, center);
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 3;
+
+                    .icon {
+                        width: 55px;
+                        height: 55px;
+                        color: $secondary_color;
+
+                        &:hover {
+                            color: $primary_color;
+                            cursor: pointer;
+                        }
+                    }
+                }
+
+                &::after {
+                    content: '';
+                    display: block;
+                    background: rgba($primary_color, 0.2);
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 2;
+                }
+            }
+
+            .embed-container {
+                position: relative;
+                z-index: 1;
+            }
+        }
+    }
+}

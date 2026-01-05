@@ -1,0 +1,26 @@
+.locations {
+    position: relative;
+    padding: 50px;
+
+    .locations-container {
+        @extend %container_md;
+        @include flex(wrap, center, center);
+        column-gap: 2em;
+        row-gap: 2em;
+        
+        .location {
+            @include flex(col, center, center);
+            row-gap: 1em;
+            text-align: center;
+            color: $accent_color_2;
+
+            .location-text {
+                color: $primary_color;
+
+                span {
+                    color: $accent_color_2;
+                }
+            }
+        }
+    }
+}

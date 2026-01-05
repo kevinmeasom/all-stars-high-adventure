@@ -1,0 +1,125 @@
+#linktree_page {
+    position: relative;
+
+    .linktree-header {
+        @include flex(row, center, center);
+        width: 100%;
+        max-width: 912px;
+        padding: 50px;
+        margin: 0 auto;
+
+        .linktree-image-left {
+            align-self: flex-end;
+            position: relative;
+            width: 34%;
+            z-index: 1;
+            border-top: 10px solid $secondary_color;
+            border-right: 10px solid $secondary_color;
+        }
+
+        .linktree-image-right {
+            align-self: flex-start;
+            width: 39%;
+            margin: 0 50px 50px -4%;
+        }
+
+        .linktree-header-inner {
+            @include flex(col, start, center);
+            position: relative;
+            z-index: 1;
+            align-self: flex-start;
+            width: 30%;
+            padding-top: 50px;
+
+            .linktree-header-subtitle {
+                font-family: $font_script;
+                font-size: 35px;
+                margin-bottom: 0px;
+            }
+
+            .linktree-header-title {
+                text-transform: capitalize;
+                
+                span {
+                    font-family: $font_script;
+                    font-size: 14px;
+                }
+            }
+
+            .linktree-header-text {
+                font-family: $font_body;
+            }
+        }
+    }
+
+    .linktree-wrapper {
+        position: relative;
+        @include flex(col, center, start);
+        margin: 0 0 60px;
+
+        .linktree_title {
+            text-align: center;
+        }
+
+        .linktree-links {
+            @include flex(col, center, start);
+            width: 100%;
+            max-width: 470px;
+
+            .linktree-link { 
+                width: 100%;
+                margin: 10px 20px;
+                font-size: 13px !important;
+                font-weight: bold !important;
+                padding: 12px !important;
+            }
+        }
+    }
+
+    @include respond-to(medium, max) { 
+
+        .linktree-header {
+            flex-direction: column !important;
+            padding: 0px 30px 30px;
+
+            .linktree-image-left {
+                width: 52%;
+            }
+
+            .linktree-image-right {
+                width: 52%;
+                margin: -111px 0 20px;
+            }
+
+            .linktree-header-inner {
+                padding-top: 0 !important;
+                width: 100%;
+                text-align: center;
+
+                .linktree-header-title {
+                    span {
+                        font-size: 24px;
+                    }
+                }
+
+                .linktree-header-subtitle {
+                    margin-bottom: -10px;
+                }
+
+                .linktree-header-text {
+                    font-family: $font_body;
+                }
+            }
+        }
+
+       .linktree-wrapper {
+            .linktree-links {
+                max-width: 300px;
+            }
+
+            .red-blob {
+                transform: translate(0, -92%);
+            }
+       }
+    }
+}

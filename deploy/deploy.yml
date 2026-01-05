@@ -1,0 +1,59 @@
+##################################################
+# DO Community Playbooks: LEMP on Ubuntu 18.04
+# Staging Usage: ansible-playbook -l server -i hosts -u root deploy.yml env=staging
+# Production Usage: ansible-playbook -l server -i hosts -u root deploy.yml env=production
+##################################################
+---
+- hosts: all
+  become: true
+  become_flags: "--preserve-env=SSH_AUTH_SOCK"
+  vars_files:
+    - group_vars/all.yml
+    - group_vars/{{ env }}.yml
+
+  tasks:
+    - name: Clone project files
+      git:
+        repo: "{{ project_git_repo }}"
+        dest: "/var/www/{{ http_host }}/assets/"
+        version: "{{ project_branch }}"
+        accept_hostkey: yes
+        clone: yes
+        update: yes
+        force: yes
+      ignore_errors: true
+      no_log: true
+      register: assets_clone
+      tags: [ project-files, project-clone ]
+    
+    - name: Copy plugins
+      become: true 
+      copy:
+        src: "/var/www/{{ http_host }}/assets/wordpress/wp-content/plugins"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-content/"
+        remote_src: yes
+        owner: www-data
+        group: www-data        
+        mode: 0750
+      when: assets_clone.changed
+      tags: [ project-files, project-plugins ]
+    
+    - name: Copy theme
+      become: true 
+      copy:
+        src: "/var/www/{{ http_host }}/assets/wordpress/wp-content/themes/{{ project_theme }}"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-content/themes/"
+        remote_src: yes
+        owner: www-data
+        group: www-data        
+        mode: 0750
+      when: assets_clone.changed
+      tags: [ project-files, project-theme ]
+    
+    - name: Remove temp assets folder
+      become: true 
+      file:
+        path: "/var/www/{{ http_host }}/assets"
+        state: absent
+      when: assets_clone.changed
+      tags: [ project-files, project-cleanup ]

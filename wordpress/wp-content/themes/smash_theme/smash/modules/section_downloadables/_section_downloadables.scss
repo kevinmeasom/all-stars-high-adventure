@@ -1,0 +1,30 @@
+.downloadables-wrapper {
+    position: relative;
+    padding: 80px 50px;
+
+    .downloadables-container {
+        @extend %container_md;
+        @include flex(col, start, start);
+        row-gap: 3em;
+
+        .downloadable-item {
+            @include flex(row, center, start);
+            column-gap: 1em;
+            width: 100%;
+
+            .downloadable-image {
+                flex: 1;
+            }
+
+            .downloadable-body {
+                @include flex(col, start, center);
+                row-gap: 10px;
+                flex: 4;
+
+                .downloadable-cta {
+                    @extend %btn-primary;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,71 @@
+.press {
+    position: relative;
+    padding: 50px;
+
+    .press-container {
+        @extend %container_lg;
+        padding: 50px 0 0;
+        border-top: 1px solid $line_color;
+
+        .press-title {
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .press-slider {
+            width: 100%;
+
+            .press-slide {
+                position: relative;
+                padding: 0 20px;
+                text-align: center;
+                height: inherit !important;
+
+                .press-slide-inner {
+                    @include flex(row, center, center);
+                    height: 100%;
+                    
+                    .press-image {
+                        max-height: 80px;
+                    }
+                }
+            }
+
+            &.slick-slider {
+                .slick-track {
+                    display: flex !important;
+                }
+                .slick-arrow {
+                    top: 25%;
+
+                    &.slick-next {
+                        right: -4%;
+
+                        .icon {
+                            width: 25px;
+                            height: 25px;
+                        }
+                    }
+                    &.slick-prev {
+                        left: -4%;
+
+                        .icon {
+                            width: 25px;
+                            height: 25px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max) {
+        padding: 70px 40px 90px;
+
+        .press-container {
+            .press-title {
+                margin-bottom: 50px;
+            }
+        }
+    }
+}

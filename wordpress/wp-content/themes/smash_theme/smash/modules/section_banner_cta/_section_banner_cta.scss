@@ -1,0 +1,44 @@
+.banner-cta {
+    position: relative;
+
+    .banner-cta-image {
+        width: 100%;
+        padding: 80px 50px;
+
+        .banner-cta-body {
+            @include flex(col, center, center);
+            row-gap: 1em;
+            width: 100%;
+            max-width: 900px;
+
+            .banner-cta-title {
+                @extend %text_shadow;
+                font-size: $main_title;
+                color: $secondary_color;
+
+                @include respond-to(xlarge, max){
+                    font-size: $h1;
+                }
+                @include respond-to(large, max){
+                    font-size: $h2;
+                }
+                @include respond-to(medium, max){
+                    font-size: $h3;
+                }
+                @include respond-to(small, max){
+                    font-size: $h5;
+                }
+            }
+        }
+
+        &.justify-start {
+            text-align: left;
+        }
+        &.justify-center {
+            text-align: center;
+        }
+        &.justify-end {
+            text-align: right;
+        }
+    }
+}

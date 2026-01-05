@@ -1,0 +1,151 @@
+#banner_photo_insert {
+  @include flex(row, center, center);
+  background-color: $bg_color;
+  position: relative;
+  margin: 0;
+  padding: 0;
+
+    .banner-photo {
+        position: relative;
+        width: 42%;
+    }
+
+    .banner-inner-photo {
+      position: relative;
+        z-index: 2;
+        width: 20%;
+        margin-left: -10%;
+    }
+
+  .banner-inner {
+    @include flex(col, center, center);
+    width: 50%;
+    padding: 50px;
+
+    .banner-inner-body {
+      @include flex(col, center, center);
+      row-gap: 2em;
+
+      .banner-title {
+        font-family: $font_script;
+        line-height: 1;
+        font-size: 64px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .banner-text {
+        line-height: 1.7;
+          font-family: $font_body;
+      }
+    }
+  }
+
+  @include respond-to(xxlarge, max) {
+    max-height: 570px;
+    .banner-inner .banner-inner-body {
+      height: 70%;
+      max-height: 430px;
+
+        .banner-title {
+        line-height: 1;
+        font-size: 57px;
+      }
+    }
+  }
+
+  @include respond-to(xlarge, max) {
+    height: 48vh;
+    min-height: 450px;
+
+    .banner-photo {
+      width: 44%;
+    }
+    .banner-insert-container {
+      //adding this container to use flex to vertically center insert image, and center contents of next div
+      //add bg-color to see what's happening
+  
+      //background-color: crimson;
+      width: 7%;
+
+      .banner-inner-photo {
+        //to change photo size, change width of containing div or width
+        width: 450%;
+        left: -330%;
+      }
+    }
+    .banner-inner {
+      .banner-inner-body {
+        height: 80%;
+        padding: 0 8%;
+
+        .banner-title {
+          font-size: 50px;
+        }
+      }
+    }
+  }
+
+  @include respond-to(medium, max) { 
+    @include flex(col, center, space-between);
+    height: unset;
+    max-height: unset;
+    //negative bottom margin to compensate for .banner-inner's top margin
+    margin-bottom: -35vw;
+
+    .banner-photo {
+      height: 65vh;
+      //min-height: 65vh;
+      width: 100%
+    }
+    .banner-insert-container {
+      @include flex(col, center, center);
+      width: 100%;
+      //switched sizing to vw to keep insert square
+      //height is insert photo height
+      height: 70vw;
+
+      .banner-inner-photo {
+        //when adjusting insert size and placement, remember to adjust container height as well
+        min-height: 70vw;
+        width: 70vw;
+        //half container height
+        top: -35vw;
+        left: unset;
+      }
+    }
+
+    .banner-inner {
+      @include flex(col, center, end);
+      width: 100%;
+      position: relative;
+      //to cover bottom of above container div
+      //if adjusting. slso ajust compensatory negative bottom margin on whole section
+      top: -35vw;
+      //to center text
+      height: 70vw;
+      padding-top: 30px;
+
+      .banner-inner-body {
+        height: 100%;
+        padding: 30px 30px 0;
+
+      }
+    }
+  }
+  @include respond-to(480, max) {
+    //margin-bottom: 0;
+    //padding-bottom: 50px;
+
+    .banner-inner {
+      height: 410px;
+      //padding-top: 10px;
+      .banner-inner-body {
+        padding-top: 10px;
+        .banner-title {
+          font-size: 40px;
+        }
+      }
+    }
+  }
+}

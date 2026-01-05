@@ -1,0 +1,34 @@
+.fixed-search {
+    @extend %ease;
+    opacity: 0;
+    position: fixed;
+    bottom: 0;
+    right: 30px;
+    z-index: 100;
+    background: $bg_color;
+    color: $secondary_color;
+    padding: 20px 50px;
+
+    .fixed-search-inner {
+        @include flex(col, center, center);
+        width: 100%;
+
+        input {
+            color: $secondary_color;
+            
+            &::placeholder {
+                color: $secondary_color;
+            }
+        }
+
+        button {
+            color: $secondary_color;
+        }
+    }
+}
+
+@at-root body.lock_nav {
+    .fixed-search {
+        opacity: 1;
+    }
+}

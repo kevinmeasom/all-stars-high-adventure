@@ -1,0 +1,45 @@
+.hero-slider-wrapper {
+    position: relative;
+
+    .hero-slider {
+        width: 100%;
+
+        .hero-slide {
+            .hero-slide-inner {
+                @include flex(col, center, center);
+                position: relative;
+                width: 100%;
+                color: $secondary_color;
+                min-height: 550px;
+                padding: 100px 50px;
+                
+                .hero-slide-body {
+                    @include flex(col, center, center);
+                    row-gap: 2em;
+                    position: relative;
+                    z-index: 2;
+                    max-width: 670px;
+                    width: 100%;
+                    text-align: center;
+                    
+                    .hero-slide-cta {
+                        @extend %btn-primary;
+                    }
+                }
+
+                &::after {
+                    content: '';
+                    max-width: 100%;
+                    display: block;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 1;
+                    background: $overlay_black;
+                }
+            }
+        }
+    }
+}

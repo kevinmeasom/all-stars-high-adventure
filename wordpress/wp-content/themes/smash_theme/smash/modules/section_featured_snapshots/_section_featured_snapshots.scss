@@ -1,0 +1,31 @@
+.featured-snapshots-wrapper {
+    position: relative;
+
+    .featured-snapshots-header {
+        @include flex(row, center, between);
+        padding: 20px;
+        background: $bg_color;
+
+        .featured-snapshots-header-left {
+            @include flex(row, center, start);
+            column-gap: 10px;
+        }
+        
+        .featured-snapshots-header-right {
+            @include flex(row, center, end);
+        }
+    }
+
+    .featured-snapshots {
+        @include flex(row, null, center);
+
+        .snapshot {
+            flex: 1;
+            padding: 0;
+
+            .post-products-wrap {
+                display: none !important;
+            }
+        }
+    }
+}

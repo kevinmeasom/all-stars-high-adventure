@@ -1,0 +1,166 @@
+.quick-shop {
+    position: relative;
+    padding: 50px 120px;
+
+    .quick-shop-container {
+        //@extend %container_xl;
+        @include flex(row, center, between);
+
+        .quick-shop-left {
+            @include flex(col, center, center);
+            width: 50%;
+            text-align: center;
+            row-gap: 10px;
+
+            .quick-shop-image {
+                @include flex(col, start, start);
+                position: relative;
+                width: 100%;
+
+                .quick-shop-label {
+                    position: absolute;
+                    top: 30px;
+                    left: 0;
+                    transform: translate(-30px, 0);
+                    background: $accent_color;
+                    padding: 10px 30px;
+                }
+            }
+
+            .quick-shop-body {
+                @include flex(col, center, center);
+                row-gap: 10px;
+                padding: 20px 0;
+
+                .quick-shop-title {
+                    text-transform: capitalize;
+                    font-size: 36px;
+                    margin: 10px;
+                }
+            }
+        }
+
+        .quick-shop-products-wrapper {
+            @include flex(col, center, center);
+            width: 46%;
+            
+            .quick-shop-products {
+                @include flex(wrap, null, center);
+                width: 100%;
+    
+                .product {
+                    width: 50%;
+                    padding: 10px;
+                    text-align: center;
+                    margin-bottom: 40px;
+    
+                    .product-wrap {
+
+                        .product-image {
+                            width: 37%;
+                        }
+                    }
+
+                    @include respond-to(large, max){
+                        width: 50%;
+                    }
+                }
+            }
+
+            .quick-shop-cta {
+                @extend %btn-primary;
+            }
+        }
+    }
+
+    @include respond-to(1260, max) {
+        .quick-shop-container .quick-shop-products-wrapper .quick-shop-products .product {
+            margin-bottom: 0;
+
+            .product-body {
+                .product-brand {
+                    text-align: left;
+                }
+            }
+        }
+
+        padding: 50px 50px;
+    }
+
+
+    @include respond-to(xxlarge, max) {
+        padding: 50px 80px;
+        //.quick-shop-container .quick-shop-products-wrapper .quick-shop-products 
+            .product .product-wrap .product-body {
+                margin: 0;
+            }
+    }
+
+
+    @include respond-to(xlarge, max) {
+        padding: 50px 40px;
+
+        .quick-shop-container {
+            flex-direction: column !important;
+
+            .quick-shop-left {
+                width: 100%;
+            }
+
+            .quick-shop-products-wrapper {
+                width: 100%;
+                .quick-shop-products {
+                    .product {
+                         margin-bottom: 50px;
+                    }
+                }
+            }
+        }
+    }
+
+    @include respond-to(medium, max) {
+        padding: 50px 20px;
+
+        .quick-shop-container {
+            .quick-shop-products {
+
+                .quick-shop-products-wrapper {
+                    .quick-shop-products {
+                        .product {
+                            margin-bottom: 20px;
+                        }
+                    }
+                }
+                .product {
+                    .product-wrap {
+                        flex-direction: column !important;
+
+                        .product-image {
+                            width: 100% !important;
+                        }
+
+                        .product-body {
+                            width: 100% !important;
+                            padding-top: 10px;
+                            margin: 0;
+
+                            .product-brand {
+                                width: 100%;
+                                padding: 5px 0;
+                                text-align: center;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .product-wrap {
+            .product-body {
+                .product-title {
+                    text-align: center !important;
+                }
+            }
+        }
+    }
+}

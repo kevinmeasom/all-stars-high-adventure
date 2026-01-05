@@ -1,0 +1,14 @@
+.title-section {
+    @include flex(col, center, center);
+    position: relative;
+    width: 100%;
+    padding: 50px;
+
+    .title-section-title {
+        text-align: center;
+    }
+
+    &.has-bg {
+        background: $bg_color;
+    }
+}

@@ -1,0 +1,8 @@
+[wordpress]
+enabled = true
+port = http,https
+filter = wordpress
+action = iptables-multiport[name=wordpress, port="http,https", protocol=tcp]
+logpath = /var/log/nginx/access*log
+maxretry = 10
+findtime = 600

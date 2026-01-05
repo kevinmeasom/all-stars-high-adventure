@@ -1,0 +1,38 @@
+.loop-sidebar {
+    @include flex(row, start, between);
+    position: relative;
+    padding: 50px 0;
+
+    .loop-sidebar-posts {
+        @include flex(col, start, start);
+        width: 60%;
+    }
+
+    #secondary {
+        width: 30%;
+        max-width: 320px;
+    }
+
+    @include respond-to(xxlarge, max) { 
+        padding: 40px;
+
+        .loop-sidebar-posts {
+            @include flex(col, start, start);
+            width: 64%;
+        }
+    }
+
+    @include respond-to(medium, max) { 
+        padding: 50px 20px;
+        flex-direction: column !important;
+
+        .loop-sidebar-posts {
+            width: 100%;
+        }
+
+        #secondary { 
+            width: 100%;
+            align-self: center;
+        }
+    }
+}

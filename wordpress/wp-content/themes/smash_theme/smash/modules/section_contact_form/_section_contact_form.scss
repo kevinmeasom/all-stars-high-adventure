@@ -1,0 +1,72 @@
+.contact-form {
+    width: 100%;
+
+    input {
+        border: none !important;
+        border-bottom: 1px solid #C7C7C7 !important;
+        border-radius: 0 !important;
+    }
+    textarea {
+        border: none !important;
+        border-bottom: 1px solid #C7C7C7 !important;
+        border-radius: 0 !important;
+    }
+    .nf-field-container {
+        margin-bottom: 20px;
+    }
+    nf-field {
+        @include flex(row, start, start);
+        display: block;
+
+        .nf-field-container {
+            width: 90%;
+
+            &.submit-container {
+                width: auto;
+            }
+        }
+
+        input[value="Submit"][type="button"] {
+            @extend %btn-primary;
+            padding: 14px 60px !important;
+            font-size: 14px !important;
+        }
+    }
+    .nf-field-element {
+        textarea {
+            height: 106px;
+        }
+    }
+    .label-above {
+        .nf-field-label {
+            margin: 0;
+        }
+    }
+    .nf-field-label {
+        label {
+            font-weight: 700;
+            margin: 0;
+            padding: 0;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+    }
+    .nf-form-fields-required {
+        display: none !important;
+    }
+
+    .nf-fields-wrap input, .field-wrap textarea {
+        width: 90%;
+    }
+
+    @include respond-to(medium, max) {
+        .nf-fields-wrap input, .field-wrap textarea {
+            width: 100%;
+        }
+
+        nf-field {
+            justify-content: center !important;
+        }
+    }
+}

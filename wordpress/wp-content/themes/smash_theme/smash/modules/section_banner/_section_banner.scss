@@ -1,0 +1,62 @@
+.banner-parallax {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -2;
+
+    &.on-top {
+        z-index: -1;
+    }
+}
+.parallax-banner-cta {
+    position: relative;
+    padding: 50px 6%;
+    width: 100%;
+
+    &.use-parallax {
+        background: transparent !important;
+    }
+    
+    #banner_waypoint_top {
+        position: relative;
+        top: -135vh;
+    }
+    
+    .banner-body {
+        max-width: 420px;
+        width: 100%;
+
+        .banner-text {
+            margin-bottom: 10px;
+        }
+    }
+
+    &.justify-start {
+        .banner-body {
+            @include flex(col, start, center);
+            text-align: left;
+        }
+    }
+    &.justify-center {
+        .banner-body {
+            @include flex(col, center, center);
+            text-align: center;
+        }
+    }
+    &.justify-end {
+        .banner-body {
+            @include flex(col, end, center);
+            text-align: right;
+        }
+    }
+
+    @include respond-to(medium, max){  
+        h2.banner-title {
+            font-size: 24px;
+        }
+    }
+}

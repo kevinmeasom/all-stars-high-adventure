@@ -1,0 +1,51 @@
+.tiled-products-wrapper {
+    position: relative;
+    padding: 50px;
+
+    .tiled-products-container {
+        @extend %container_xl;
+
+        .tiled-products-title {
+            text-align: center;
+        }
+
+        .tiled-products {
+            @include flex(row, null, center);
+
+            .tiled-products-col {
+                @include flex(col, center, center);
+                padding: 30px;
+                flex: 1;
+
+                .product {
+                    width: 100%;
+                }
+
+                &:first-child {
+                    flex: 2;
+                    border-right: 1px solid $line_color;
+                    
+                    &:only-child {
+                        border-right: none;
+                    }
+
+                    .product {
+                        .product-wrap {
+                            .product-image {
+                                flex: 1;
+                            }
+    
+                            .product-body {
+                                flex: 2;
+                            }
+                        }
+
+                        &:first-child {
+                            border-bottom: 1px solid $line_color;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

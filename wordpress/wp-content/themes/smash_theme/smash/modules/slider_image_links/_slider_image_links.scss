@@ -1,0 +1,79 @@
+.image-links {
+    position: relative;
+    padding: 50px;
+
+    .slick-slider {
+        .slick-arrow {
+            &.slick-prev {
+                left: -2%;
+            }
+
+            &.slick-next {
+                right: -2%;
+            }
+        }
+    }
+
+    .image-links-container {
+        @extend %container_xl;
+        @include flex(col, center, center);
+        position: relative;
+        row-gap: 2em;
+        z-index: 2;
+
+        .image-links-title {
+            font-size: 42px;
+            line-height: 64px;
+        }
+
+        .image-links-text {
+            text-align: center;
+        }
+
+        .image-links-slider {
+            width: 100%;
+
+            .image-link {
+                padding: 10px;
+                padding-bottom: 40px;
+
+                .image-link-inner {
+                    @include flex(col, center, end);
+                    width: 100%;
+
+                    .image-link-title {
+                        @include flex(col, center, center);
+                        text-align: center;
+                        padding: 12px;
+                        width: 160px;
+                        height: 80px;
+                        background: url('smash/images/btn-bg.png') no-repeat center/contain;
+                        transform: translate(0, 40px);
+                    }
+                }
+
+                &:hover {
+                    opacity: .8;
+                }
+            }
+        }
+
+        .image-links-cta {
+            @extend %btn-primary;
+            padding: 13px 60px !important;
+        }
+    }
+
+    @include respond-to(xlarge, max) {
+        padding: 50px 40px;
+        .image-links-container {
+            row-gap: 1em;
+        }
+    }
+    @include respond-to(large, max) {
+        padding: 50px 40px;
+    }
+    @include respond-to(medium, max) {
+        padding: 50px 30px;
+    }
+}

@@ -1,0 +1,70 @@
+.about-alt-section {
+    position: relative;
+    padding: 50px;
+
+    .about-alt-section-container {
+        @extend %container_xxl;
+        @include flex(row, start, between);
+        position: relative;
+        z-index: 2;
+
+        .about-alt-section-body {
+            position: relative;
+            @include flex(col, start, center);
+            row-gap: 2em;
+            flex: 1;
+            background: $bg_color;
+            padding: 50px;
+            margin-left: -4em;
+            z-index: 2;
+
+            .about-alt-section-subtitle {
+                font-size: 12px;
+                line-height: 25px;
+                letter-spacing: 2px;
+                font-family: $font_nav;
+                text-transform: uppercase;
+            }
+
+            h3.about-alt-section-title {
+                font-size: 37px;
+                line-height: 44px;
+                font-family: $font_title;
+                width: 80%;
+
+                span {
+                    color: $accent_color_2;
+                    font-weight: 700;
+                }
+            }
+
+            .about-alt-section-text {
+                p {
+                    font-size: 15px;
+                    line-height: 26px;
+
+                    span {
+                        font-weight: 700;
+                    }
+                }
+            }
+
+            .about-cta {
+                @extend %btn-primary;
+                font-size: 11px !important;
+                padding: 13px 60px !important;
+            }
+        }
+
+        .about-alt-section-image-wrap {
+            position: relative;
+            flex: 1;
+
+            .about-alt-section-image {
+                position: relative;
+                width: 100%;
+                z-index: 2;
+            }
+        }
+    }
+}

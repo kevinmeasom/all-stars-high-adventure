@@ -1,0 +1,64 @@
+.shop-highlights-image {
+    position: relative;
+    width: 100%;
+
+    .shop-dot-wrapper {
+        position: absolute;
+
+        .shop-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 100%;
+            background: $secondary_color;
+            border: 1px solid #909090;
+        }
+
+        .shop-dot-product {
+            @extend %ease;
+            @include flex(row, center, center);
+            padding: 20px;
+            background: $secondary_color;
+            min-width: 275px;
+            position: absolute;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 10;
+
+            .shop-dot-product-image {
+                width: 40%;
+            }
+
+            .shop-dot-product-body {
+                @include flex(col, center, center);
+                width: 60%;
+                padding: 0 20px;
+                text-align: center;
+
+                .shop-dot-product-meta {
+                    @include flex(row, center, center);
+                    
+                    span {
+                        @include flex(row, center, center);
+                        margin-right: 5px;
+                    }
+                }
+
+                .shop-dot-product-cta  {
+                    font-size: 10px;
+
+                    .icon {
+                        width: 10px;
+                        height: 10px;
+                    }
+                }
+            }
+        }
+
+        &:hover {
+            .shop-dot-product {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+.social-icons {
+    @include flex(wrap, center, center);
+    position: relative;
+    column-gap: 15px;
+    row-gap: 5px;
+
+    .social-icons-header {
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    
+    .social-icon {
+        @include flex(row, center, center);
+        font-size: 12px;
+        column-gap: 5px;
+    
+        span {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    }
+}
