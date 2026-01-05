@@ -317,32 +317,32 @@
       command: wp plugin activate wp-migrate-db-pro --allow-root
       args:
         chdir: "/var/www/{{ http_host }}/wordpress"
-      tags: [ wordpress-setup ]
+      tags: [ wordpress-setup, wpmigrate ]
 
     - name: Add wp-migrate-db-pro license
       command: wp migratedb setting update license --user={{ wp_admin_user }} {{ wp_migrate_db_key }} --allow-root
       args:
         chdir: "/var/www/{{ http_host }}/wordpress"
-      tags: [ wordpress-setup ]
+      tags: [ wordpress-setup, wpmigrate ]
 
     - name: Enable Pull Requests
       command: wp migratedb setting update pull on --user={{ wp_admin_user }} --allow-root
       args:
         chdir: "/var/www/{{ http_host }}/wordpress"
-      tags: [ wordpress-setup ]
+      tags: [ wordpress-setup, wpmigrate ]
 
     - name: Enable Push Requests
       command: wp migratedb setting update push on --user={{ wp_admin_user }} --allow-root
       args:
         chdir: "/var/www/{{ http_host }}/wordpress"
-      tags: [ wordpress-setup ]
+      tags: [ wordpress-setup, wpmigrate ]
 
   # Sets Up PHP Info Page
     - name: Sets Up PHP Info Page
       template:
         src: "files/info.php.j2"
         dest: "/var/www/html/info.php"      
-      tags: [ wordpress-setup ]
+      tags: [ wordpress-setup, wpmigrate ]
 
   #Let's Encrypt SSL
     - name: Include SSL Tasks

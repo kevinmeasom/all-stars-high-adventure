@@ -3,6 +3,7 @@
 http_prot: "https"
 http_host: "allstarshighadventure.org" #default version
 http_secondary: "www.allstarshighadventure.org allstarshighadventure.com www.allstarshighadventure.com" #all domains separated by space that should redirect to http_host (ie. www.example.com, other.com, www.other.com)
+ssl_domains: "-d www.allstarshighadventure.org -d allstarshighadventure.com -d www.allstarshighadventure.com" #all domains separated by space that should redirect to http_host (ie. www.example.com, other.com, www.other.com)
 http_conf: "allstarshighadventure.org.conf"
 
 #Project Settings

@@ -7,7 +7,7 @@
 - name: Certbot SSL (issue certificate only, don't modify nginx)
   command: >
     certbot certonly --nginx -n
-    -d {{ http_host }} -d {{ http_secondary }}
+    -d {{ http_host }} {{ ssl_domains }}
     -m {{ letsencrypt_email }}
     --agree-tos --keep-until-expiring --expand
   when: (env == "production") and http_prot == "https"
