@@ -24,7 +24,8 @@ class NF_Fields_Textbox extends NF_Abstracts_Input
 	    'mask',
 	    'custom_mask',
 	    'custom_name_attribute',
-	    'personally_identifiable'
+	    'personally_identifiable',
+	    'custom_autocomplete'
     );
 
     public function __construct()
@@ -38,16 +39,7 @@ class NF_Fields_Textbox extends NF_Abstracts_Input
 
     public function filter_csv_value( $field_value, $field ) {
 
-        /*
-         * sanitize this in case someone tries to inject data that runs in
-         * Excel and similar apps
-         * */
-        if( 0 < strlen( $field_value ) ) {
-            $first_char = substr( $field_value, 0, 1 );
-            if( in_array( $first_char, array( '=', '@', '+', '-' ) ) ) {
-                return "'" . $field_value;
-            }
-        }
+        $field_value = WPN_Helper::maybe_escape_csv_column( $field_value );
 
         return $field_value;
     }

@@ -96,7 +96,19 @@ class PostmanTransportRegistry {
 	 * @return boolean
 	 */
 	public function getActiveTransport() {
+	    // During fallback mode, always use SMTP transport
+	    $options = PostmanOptions::getInstance();
+	    if ( $options->is_fallback ) {
+	        $transports = $this->getTransports();
+	        if ( isset( $transports['smtp'] ) ) {
+	            return $transports['smtp'];
+	        } else {
+	            return $transports['default'];
+	        }
+	    }
+	    
 		$selectedTransport = PostmanOptions::getInstance()->getTransportType();
+		
 		$transports = $this->getTransports();
 		if ( isset( $transports [ $selectedTransport ] ) ) {
 			$transport = $transports [ $selectedTransport ];
@@ -232,23 +244,35 @@ class PostmanTransportRegistry {
 	/**
 	 */
 	public function getReadyMessage() {
+		
+		$message = array();
+		
 		if ( $this->getCurrentTransport()->isConfiguredAndReady() ) {
 			if ( PostmanOptions::getInstance()->getRunMode() != PostmanOptions::RUN_MODE_PRODUCTION ) {
-				return array(
+				$message = array(
 					'error' => true,
 					'message' => __( 'Postman is in <em>non-Production</em> mode and is dumping all emails.', 'post-smtp' ),
 				);
 			} else {
-				return array(
+				$message = array(
 					'error' => false,
 					'message' => __( 'Postman is configured.', 'post-smtp' ),
 				);
 			}
 		} else {
-			return array(
+			$message = array(
 				'error' => true,
 				'message' => __( 'Postman is <em>not</em> configured and is mimicking out-of-the-box WordPress email delivery.', 'post-smtp' ),
 			);
 		}
+	
+		/**
+		 * Filters Dashobard Notice
+		 * 
+		 * @since 2.6.0
+		 * @version 1.0.0
+		 */
+		return apply_filters( 'post_smtp_dashboard_notice', $message );
+	
 	}
 }

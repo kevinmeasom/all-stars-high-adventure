@@ -6,6 +6,7 @@ if (!defined('AIOWPS_FIREWALL_DIR')) {
 	exit();
 }
 
+
 /**
  * Loads and executes our firewall
  */
@@ -33,10 +34,14 @@ class Loader {
 			 */
 			if ($this->is_preloader_directly_accessed()) return;
 			
+			$this->init();
 
-			$this->init_includes();
-			$this->init_services();
+			global $aiowps_firewall_constants;
+			if ($aiowps_firewall_constants->AIOS_NO_FIREWALL) return;
 	
+			//Allow list for bypassing PHP rules
+			if (Allow_List::is_ip_allowed()) return;
+
 			$families = new Family_Collection(Family_Builder::get_families());
 
 			foreach (Rule_Builder::get_active_rule() as $rule) {
@@ -47,14 +52,28 @@ class Loader {
 				$member->apply_all();
 			}
 			
+		} catch (Exit_Exception $e) {
+			$this->log_message($e->getMessage());
+			exit();
 		} catch (\Exception $e) {
 			$this->log_message($e->getMessage());
-		} catch (\Error $e) {
+		} catch (\Error $e) { // phpcs:ignore PHPCompatibility.Classes.NewClasses.errorFound -- this won't run on PHP 5.6 so we still want to catch it on other versions
 			$this->log_message($e->getMessage());
 		}
-
 	}
 
+	/**
+	 * Performs general initialisation
+	 *
+	 * @return void
+	 */
+	public function init() {
+
+		$this->init_includes();
+		$this->init_services();
+
+		new Debug();
+	}
 
 	/**
 	 * Detects whether the preloader file (wp-security-firewall.php) was directly accessed
@@ -87,33 +106,31 @@ class Loader {
 	 private function init_services() {
 
 		$workspace = $this->get_firewall_workspace();
-		
+
 		if (empty($workspace)) {
 			throw new \Exception('unable to locate workspace.');
 		}
 
 		$GLOBALS['aiowps_firewall_config'] = new Config($workspace . 'settings.php');
-		
+		$GLOBALS['aiowps_firewall_message_store'] = Message_Store::instance();
+		$GLOBALS['aiowps_firewall_constants'] = new Constants();
+		Allow_List::set_path($workspace.'allowlist.php');
 	 }
 
 	 /**
-	  * Get our workspace directory (i.e: where we save and load data to and from)
+	  * Get our workspace directory, i.e., where we save and load data to and from.
 	  *
 	  * @return string
 	  */
 	 private function get_firewall_workspace() {
 		global $aiowps_firewall_rules_path;
+
 		$workspace = '';
-		
+
 		if (!empty($aiowps_firewall_rules_path)) {
 			$workspace = $aiowps_firewall_rules_path;
-		} else {
-			//Are we in a WordPress context?
-			if (function_exists('wp_get_upload_dir')) {
-			   $upload_dir_info = wp_get_upload_dir();
-			   $firewall_rules_path = trailingslashit($upload_dir_info['basedir'].'/aios/firewall-rules');
-			   $workspace = wp_normalize_path($firewall_rules_path);
-			}
+		} elseif (Context::wordpress_safe()) {
+			$workspace = \AIOWPSecurity_Utility_Firewall::get_firewall_rules_path();
 		}
 
 		return $workspace;
@@ -145,7 +162,10 @@ class Loader {
 					AIOWPS_FIREWALL_DIR."/rule/rules/6g/{$rule}",
 					AIOWPS_FIREWALL_DIR."/rule/rules/bruteforce/{$rule}",
 					AIOWPS_FIREWALL_DIR."/rule/rules/blacklist/{$rule}",
+					AIOWPS_FIREWALL_DIR."/rule/rules/general/{$rule}",
+					AIOWPS_FIREWALL_DIR."/rule/rules/bots/{$rule}",
 					AIOWPS_FIREWALL_DIR."/libs/{$file}",
+					AIOWPS_FIREWALL_DIR."/libs/traits/{$classname}.php",
 				);
 
 				clearstatcache();
@@ -158,6 +178,23 @@ class Loader {
 			}
 		});
 		
+		// Manually include needed files
+		$classes_dir = dirname(AIOWPS_FIREWALL_DIR);
+
+		$manual_files = array(
+			$classes_dir.'/wp-security-firewall-resource-unavailable.php',
+			$classes_dir.'/wp-security-firewall-resource.php',
+			$classes_dir.'/wp-security-helper.php',
+		);
+
+		foreach ($manual_files as $file) {
+			clearstatcache();
+			if (file_exists($file)) include_once $file;
+		}
+
+		if (Context::wordpress_safe()) {
+			include_once("{$classes_dir}/wp-security-utility-file.php");
+		}
 	}
 
 	/**

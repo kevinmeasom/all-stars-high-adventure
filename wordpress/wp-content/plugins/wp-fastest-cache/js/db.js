@@ -58,7 +58,7 @@ var WpfcDB = {
 				type: 'GET', 
 				url: ajaxurl,
 				dataType : "json",
-				data : {"action": "wpfc_db_fix", "type": jQuery(this).attr("wpfc-db-name")},
+				data : {"action": "wpfc_db_fix", "type": jQuery(this).attr("wpfc-db-name"), "nonce" : wpfc_nonce},
 				cache: false, 
 				success: function(data){
 					if(data.success){
@@ -96,7 +96,7 @@ var WpfcDB = {
 			type: 'GET', 
 			url: ajaxurl,
 			dataType : "json",
-			data : {"action": "wpfc_db_statics"},
+			data : {"action": "wpfc_db_statics", "nonce" : wpfc_nonce},
 			cache: false, 
 			success: function(data){
 				jQuery.each(data, function(key, value){

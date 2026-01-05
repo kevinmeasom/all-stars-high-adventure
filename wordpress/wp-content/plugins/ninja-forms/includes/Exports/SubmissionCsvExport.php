@@ -84,7 +84,7 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
      * Generate CSV output and return
      * @return string
      */
-    public function handle()/* :string*/
+    public function handle(): string
     {
         $this->constructLabels();
 
@@ -95,6 +95,27 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
         $returned = $this->prepareCsv();
 
         return $returned;
+    }
+
+    /**
+     * Append each submission from the collection as a row
+     */
+    protected function appendRows()
+    {
+        $indices = $this->reverseSubmissionOrder();
+        // populate submission values for each submission in the collection, then append
+        foreach ($indices as $index) {
+
+            $row = $this->constructRow($index);
+            //Catch reference to an array or repeated fieldsets of repeater field to display each entry as a row
+            if (array_key_exists('repeater', $row) && is_array($row['repeater'])) {
+                foreach ($row['repeater'] as $eachRow) {
+                    $this->csvValuesCollection[1][0][] = $eachRow;
+                }
+            } else {
+                $this->csvValuesCollection[1][0][] = $row;
+            }
+        }
     }
 
     /** @inheritDoc */
@@ -117,7 +138,7 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
         $this->constructSeqNumLookup($aggregatedKey, $singleSubmission);
 
         $row = $this->constructSubmissionRow($aggregatedKey, $singleSubmission);
-
+        //Can be array of $rows since repeaters are divided by rows for each fieldset
         return $row;
     }
 
@@ -130,34 +151,24 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
         $nfSubs = [];
         foreach($this->submissionIds as $submissionId){
             $nfSubs[]=Ninja_Forms()->form(  )->get_sub( $submissionId );
+            $subIds[]=$submissionId;
         }
 
-      // Get any extra data from our other plugins...
-        $csv_array = apply_filters( 'nf_subs_csv_extra_values', $this->csvValuesCollection, $nfSubs, $this->submissionAggregateCsvExportAdapter->submissionAggregate->getMasterFormId() );
+        $reversedOrderNfSubs = \array_reverse($nfSubs);
+                
+        // Get any extra data from our other plugins...
+        $csv_array = apply_filters( 'nf_subs_csv_extra_values', $this->csvValuesCollection, $reversedOrderNfSubs, $this->submissionAggregateCsvExportAdapter->submissionAggregate->getMasterFormId() );
 
-            $output =    WPN_Helper::str_putcsv( $csv_array,
-                apply_filters( 'nf_sub_csv_delimiter', ',' ),
-                apply_filters( 'nf_sub_csv_enclosure', '"' ),
-                apply_filters( 'nf_sub_csv_terminator', "\n" )
-            );
-            
-            return $output;
+        $output =    WPN_Helper::str_putcsv( $csv_array,
+            apply_filters( 'nf_sub_csv_delimiter', ',' ),
+            apply_filters( 'nf_sub_csv_enclosure', '"' ),
+            apply_filters( 'nf_sub_csv_terminator', "\n" )
+        );
+        
+        return $output;
     }
 
-    /**
-     * Append each submission from the collection as a row
-     */
-    protected function appendRows()
-    {
-        $indices = $this->reverseSubmissionOrder();
-        // populate submission values for each submission in the collection, then append
-        foreach ($indices as $index) {
 
-            $row = $this->constructRow($index);
-
-            $this->csvValuesCollection[1][0][] = $row;
-        }
-    }
 
     /**
      * For NF CPT, construct lookup from index for SeqNum
@@ -200,13 +211,35 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
 
         $columnValues = $this->submissionAggregateCsvExportAdapter->getColumnValuesByAggregatedKey($aggregatedKey);
 
-        $row= array_merge($row,$columnValues);
-       
-        $strippedRow = WPN_Helper::stripslashes($row);
-        // Legacy Filter from 2.9.*
-        $filteredRow = apply_filters('nf_subs_csv_value_array', $strippedRow, $this->submissionIds);
+        if( array_key_exists('repeater', $columnValues) ){
+            $strippedRows = [];
+            $newColumnValues = $columnValues;
+            $repeaterValuesArray = [];
+            unset($newColumnValues['repeater']);
+            $row = array_merge($row, $newColumnValues);
+            //Extract Repeater rows
+            foreach($columnValues['repeater'] as $repeaterFieldID => $repeaterFieldsetRowValue){
+                foreach($repeaterFieldsetRowValue as $index => $fieldsetValue){
+                    $repeaterValuesArray[$index][$repeaterFieldID] = $fieldsetValue; 
+                }
+            }
+            //insert global row data in repeater rows
+            foreach($repeaterValuesArray as $rowIncludingRepeaterData){
+                $row = array_merge($row, $rowIncludingRepeaterData);
+                $strippedRows["repeater"][] = WPN_Helper::stripslashes($row);
+            } 
 
-        return $filteredRow;
+            return $strippedRows;
+
+        } else {
+            $row = array_merge($row,$columnValues);
+       
+            $strippedRow = WPN_Helper::stripslashes($row);
+    
+            return $strippedRow;
+        }
+
+       
     }
 
     /**
@@ -247,20 +280,17 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
         return $this->csvLabels;
     }
     /**
-     * Return filtered array of labels preceding fields
+     * Return array of labels preceding fields
      * 
      * @return array
      */
     protected function getFieldLabelsBeforeFields()/* :array */ {
-        $preFilterLabels = array(
+        $labels = array(
             '_seq_num' => '#',
             '_date_submitted' => esc_html__('Date Submitted', 'ninja-forms')
         );
 
-        // Legacy Filter from 2.9.*
-        $return = apply_filters('nf_subs_csv_label_array_before_fields', $preFilterLabels, $this->submissionIds);
-
-        return $return;
+        return $labels;
     }
 
     /**
@@ -270,7 +300,7 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
      * @param SubmissionCollectionInterface $submissionCollection
      * @return SubmissionCsvExportInterface
      */
-    public function setSubmissionCollection(/* SubmissionCollectionInterface */$submissionCollection)/* :SubmissionCsvExportInterface */
+    public function setSubmissionCollection(SubmissionCollectionInterface $submissionCollection): SubmissionCsvExportInterface 
     {
         return $this;
     }
@@ -281,7 +311,7 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
      * @param SubmissionAggregateCsvExportAdapter $submissionAggregateCsvExportAdapter
      * @return SubmissionCsvExportInterface
      */
-    public function setSubmissionAggregateCsvExportAdapter(SubmissionAggregateCsvExportAdapter $submissionAggregateCsvExportAdapter)/* :SubmissionCsvExportInterface */
+    public function setSubmissionAggregateCsvExportAdapter(SubmissionAggregateCsvExportAdapter $submissionAggregateCsvExportAdapter) :SubmissionCsvExportInterface 
     {
         $this->setDateFormat();
         
@@ -319,7 +349,8 @@ class NF_Exports_SubmissionCsvExport implements SubmissionCsvExportInterface {
      * @param string $dateFormat
      * @return SubmissionCsvExportInterface
      */
-    public function setDateFormat(/* string */$dateFormat = null)/* :SubmissionCsvExportInterface */ {
+    public function setDateFormat(string $dateFormat = null): SubmissionCsvExportInterface
+    {
         if(!empty($dateFormat)) {
             //Set new date format
             $date_format = $dateFormat;

@@ -2,11 +2,16 @@
 /*
 Plugin Name: Post Duplicator
 Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 2.28
+Version: 3.0.5
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
-Text Domain: post-duplicator
-License: GPL2
+License:           GPL-2.0+
+License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+Requires at least: 6.6
+Requires PHP:      7.4
+Tested up to:      6.9
+Text Domain:       post-duplicator
+Domain Path:       /languages
 */
 
 /*  
@@ -30,7 +35,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // Plugin version.
 if ( ! defined( 'MTPHR_POST_DUPLICATOR_VERSION' ) ) {
-	define( 'MTPHR_POST_DUPLICATOR_VERSION', '2.28' );
+	define( 'MTPHR_POST_DUPLICATOR_VERSION', '3.0.5' );
 }
 
 // Plugin Folder Path.
@@ -48,8 +53,12 @@ if ( ! defined( 'MTPHR_POST_DUPLICATOR_FILE' ) ) {
 	define( 'MTPHR_POST_DUPLICATOR_FILE', __FILE__ );
 }
 
+// Plugin Root File.
+if ( ! defined( 'MTPHR_POST_DUPLICATOR_BASENAME' ) ) {
+	define( 'MTPHR_POST_DUPLICATOR_BASENAME', plugin_basename( __FILE__ ) );
+}
 
-add_action( 'plugins_loaded', 'mtphr_post_duplicator_localization' );
+add_action( 'init', 'mtphr_post_duplicator_localization' );
 /**
  * Setup localization
  *
@@ -59,31 +68,29 @@ function mtphr_post_duplicator_localization() {
 	load_plugin_textdomain( 'post-duplicator', false, 'post-duplicator/languages/' );
 }
 
-
-
-
 /**
  * Include files.
  *
  * @since 2.27
  */
-if ( is_admin() ) {
+require_once MTPHR_POST_DUPLICATOR_DIR . 'includes/mtphr-settings/index.php';
 
-	// Load Metaboxer
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'metaboxer/metaboxer.php' );
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/api.php' );
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/hooks.php' );
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/install.php' );
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/settings.php' );
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
+
+// Load integrations
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/integrations/the-events-calendar.php' );
+
+if ( is_admin() ) { 
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/ajax.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/edit.php' );
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/functions.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/notices.php' );
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/settings.php' );
+	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
+  require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/upgrades.php' );
 }
-
-
-
-
-
 
 
 

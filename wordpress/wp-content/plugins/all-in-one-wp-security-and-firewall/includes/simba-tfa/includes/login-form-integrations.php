@@ -38,6 +38,7 @@ class Simba_TFA_Login_Form_Integrations {
 		}
 		
 		add_filter('tml_display', array($this, 'tml_display'));
+		add_filter('wppb_login_form_bottom', array($this, 'pb_login_form'));
 	
 		// We want to run first if possible, so that we're not aborted by JavaScript exceptions in other components (our code is critical to the login process for TFA users)
 		// Unfortunately, though, people start enqueuing from init onwards (before that is buggy - https://core.trac.wordpress.org/ticket/11526), so, we try to detect the login page and go earlier there. 
@@ -64,6 +65,18 @@ class Simba_TFA_Login_Form_Integrations {
 		$this->tfa->login_enqueue_scripts();
 		return $whatever;
 	}
+
+	/**
+	 * Catch Profile Builder login form
+	 *
+	 * @param Mixed $whatever
+	 *
+	 * @return Mixed
+	 */
+	public function pb_login_form($whatever) {
+		$this->tfa->login_enqueue_scripts();
+		return $whatever;
+	}
 	
 	/**
 	 * Runs upon the WP filter simba_tfa_login_enqueue_localize.
@@ -81,7 +94,7 @@ class Simba_TFA_Login_Form_Integrations {
 		// bbPress - June 2021
 		// WooCommerce - ported over from the separate wooextend.js code, June 2021
 		// Affiliates WP - ported over from the separate wooextend.js code, June 2021
-		$localize['login_form_selectors'] .= '.tml-login form[name="loginform"], .tml-login form[name="login"], #loginform, #wpmem_login form, form#ihc_login_form, .bbp-login-form, .woocommerce form.login, #affwp-login-form';
+		$localize['login_form_selectors'] .= '.tml-login form[name="loginform"], .tml-login form[name="login"], #loginform, #wpmem_login form, form#ihc_login_form, .bbp-login-form, .woocommerce form.login, #affwp-login-form, #wppb-loginform';
 		$localize['login_form_off_selectors'] .= '#ihc_login_form';
 		return $localize;
 	}
@@ -97,16 +110,20 @@ class Simba_TFA_Login_Form_Integrations {
 		$login = $affiliate_wp->login;
 		
 		$params = array(
-			'log' => stripslashes($_POST['affwp_user_login']),
-			'caller'=> $_SERVER['PHP_SELF'] ? $_SERVER['PHP_SELF'] : $_SERVER['REQUEST_URI'],
-			'two_factor_code' => isset($_POST['two_factor_code']) ? stripslashes((string) $_POST['two_factor_code']) : '',
+			// phpcs:ignore WordPress.Security.NonceVerification -- No nonce.
+			'log' => isset($_POST['affwp_user_login']) ? sanitize_user(wp_unslash($_POST['affwp_user_login'])): '',
+
+			$request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '',
+			'caller'=> isset($_SERVER['PHP_SELF']) ? sanitize_text_field(wp_unslash($_SERVER['PHP_SELF'])) : $request_uri,
+			// phpcs:ignore WordPress.Security.NonceVerification -- No nonce.
+			'two_factor_code' => isset($_POST['two_factor_code']) ? sanitize_text_field(wp_unslash((string) $_POST['two_factor_code'])) : '',
 		);
 		$code_ok = $this->tfa->authorise_user_from_login($params, true);
 		
 		$code_ok = apply_filters('simbatfa_affwp_process_login_form_auth_result', $code_ok, $params);
 		
 		if (is_wp_error($code_ok)) {
-			$login->add_error($code_ok->get_error_code, $code_ok->get_error_message());
+			$login->add_error($code_ok->get_error_code(), $code_ok->get_error_message());
 		} elseif (!$code_ok) {
 			$login->add_error('authentication_failed', __('Error:', 'all-in-one-wp-security-and-firewall').' '.apply_filters('simba_tfa_message_code_incorrect', __('The one-time password (TFA code) you entered was incorrect.', 'all-in-one-wp-security-and-firewall')));
 		}

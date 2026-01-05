@@ -1,9 +1,9 @@
-<?php if ( ! defined( 'ABSPATH' ) ) exit;
+<?php 
 
 /**
  * Class NF_Database_Models_Submission
  */
-final class NF_Database_Models_Submission
+class NF_Database_Models_Submission
 {
     protected $_id = '';
 
@@ -52,7 +52,8 @@ final class NF_Database_Models_Submission
         $this->_form_id = $form_id;
 
         if( $this->_id ){
-            $sub = get_post( $this->_id );
+            $sub = $this->retrieveSub($this->_id);
+
             if ($sub) {
                 $this->_status = $sub->post_status;
                 $this->_user_id = $sub->post_author;
@@ -62,12 +63,68 @@ final class NF_Database_Models_Submission
         }
 
         if( $this->_id && ! $this->_form_id ){
-            $this->_form_id = get_post_meta( $this->_id, '_form_id', TRUE );
+            $this->_form_id = $this->retrieveFormId($this->_id);
         }
 
         if( $this->_id && $this->_form_id ){
-            $this->_seq_num = get_post_meta( $this->_id, '_seq_num', TRUE );
+            $this->_seq_num = $this->retrieveSeqNum($this->_id);
         }
+    }
+
+    /**
+     * Get post object
+     * 
+     * Uses WP functionality
+     *
+     * @param string $id
+     * @return object
+     */
+    protected function retrieveSub($id)
+    {
+        $return = get_post( $id );
+
+        return $return;
+    }
+
+    /**
+     * Get the Form Id
+     * 
+     * Uses WP functionality
+     *
+     * @return int
+     */
+    protected function retrieveFormId( $id)
+    {
+        $return = $this->getPostMeta( $id, '_form_id', TRUE );
+        return $return;
+    }
+
+    /**
+     * Get the sequence number
+     * 
+     * Uses WP functionality
+     *
+     * @return int
+     */
+    protected function retrieveSeqNum($id)
+    {
+        $return = $this->getPostMeta( $id, '_seq_num', TRUE  );
+        return $return;
+    }
+
+    /**
+     * Get post meta value for given post Id and key
+     *
+     * @param int $id
+     * @param string $key
+     * @param bool $bool
+     * @return mixed
+     */
+    protected function getPostMeta($id, $key, $bool = TRUE)
+    {
+        $return = get_post_meta( $id, $key, $bool );
+
+        return $return;
     }
 
     /**
@@ -213,7 +270,7 @@ final class NF_Database_Models_Submission
     {
         if( ! empty( $this->_field_values ) ) return $this->_field_values;
 
-        $field_values = get_post_meta( $this->_id, '' );
+        $field_values = $this->getPostMeta( $this->_id, '' );
 
         foreach( $field_values as $field_id => $field_value ){
             $this->_field_values[ $field_id ] = implode( ', ', $field_value );
@@ -224,7 +281,14 @@ final class NF_Database_Models_Submission
 
             if( ! is_numeric( $field_id ) ) continue;
 
-            $field = Ninja_Forms()->form()->get_field( $field_id );
+            if($this->_form_id){
+
+                $field = Ninja_Forms()->form($this->_form_id)->get_field( $field_id );
+            }else{
+
+                $field = Ninja_Forms()->form()->get_field( $field_id );
+            }
+
             $key = $field->get_setting( 'key' );
             if( $key ) {
                 $this->_field_values[ $key ] = implode(', ', $field_value);
@@ -398,9 +462,6 @@ final class NF_Database_Models_Submission
             '_date_submitted' => esc_html__( 'Date Submitted', 'ninja-forms' )
         );
 
-        // Legacy Filter from 2.9.*
-        $field_labels = apply_filters( 'nf_subs_csv_label_array_before_fields', $field_labels, $sub_ids );
-
         $fields = Ninja_Forms()->form( $form_id )->get_fields();
 
         /*
@@ -446,7 +507,7 @@ final class NF_Database_Models_Submission
                         
                         $fieldsetFieldIds[]=$fieldsetFieldId;
 
-                        $field_labels[$fieldsetFieldId]=$fieldsetFieldLabel;
+                        $field_labels[$fieldsetFieldId]=WPN_Helper::maybe_escape_csv_column( $fieldsetFieldLabel );
                         
                         $fieldType = Ninja_Forms()->fieldsetRepeater->getFieldtype($fieldsetFieldId, $fieldsetSettings);
                         
@@ -472,9 +533,9 @@ final class NF_Database_Models_Submission
                   if( in_array( $field->get_setting( 'type' ), $hidden_field_types ) ) continue;
 
                   if ( $field->get_setting( 'admin_label' ) ) {
-                      $field_labels[ $field->get_id() ] = $field->get_setting( 'admin_label' );
+                      $field_labels[ $field->get_id() ] = WPN_Helper::maybe_escape_csv_column( $field->get_setting( 'admin_label' ) );
                   } else {
-                      $field_labels[ $field->get_id() ] = $field->get_setting( 'label' );
+                      $field_labels[ $field->get_id() ] = WPN_Helper::maybe_escape_csv_column( $field->get_setting( 'label' ) );
                   }
 
                   $field_value = maybe_unserialize( $sub->get_field_value( $field_id ) );
@@ -531,9 +592,6 @@ final class NF_Database_Models_Submission
         }
 
         $value_array = WPN_Helper::stripslashes( $value_array );
-
-        // Legacy Filter from 2.9.*
-        $value_array = apply_filters( 'nf_subs_csv_value_array', $value_array, $sub_ids );
 
         $csv_array[ 0 ][] = $field_labels;
         $csv_array[ 1 ][] = $value_array;
@@ -611,6 +669,20 @@ final class NF_Database_Models_Submission
     protected function _save_extra_values()
     {
         if( ! $this->_extra_values ) return FALSE;
+
+        $maxCount = apply_filters('ninja_forms_max_extra_data_count',200,$this->_form_id);
+
+        /*
+         * if extra data has more than 200 elements, then stop.  Add-ons should
+         * not be adding those many individual pieces of data; rather, they
+         * should add data keyed on specific functional areas from their usage.
+         *
+         * Over the allowed limit, it is expected to be an attack.  Site
+         * developers can use filter to raise limit either globally or per-form
+         */
+        if($maxCount<count($this->_extra_values)){
+            return FALSE;
+        }
 
         foreach( $this->_extra_values as $key => $value )
         {

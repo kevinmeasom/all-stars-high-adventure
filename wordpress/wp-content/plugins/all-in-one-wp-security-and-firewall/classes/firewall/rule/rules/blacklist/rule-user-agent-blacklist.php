@@ -37,7 +37,7 @@ class Rule_User_Agent_Blacklist extends Rule {
 	 * @return boolean
 	 */
 	public function is_active() {
-		return !empty($this->blocked_user_agents);
+		return !empty($this->blocked_user_agents) && isset($_SERVER['HTTP_USER_AGENT']);
 	}
 
 	/**
@@ -47,7 +47,8 @@ class Rule_User_Agent_Blacklist extends Rule {
 	 */
 	public function is_satisfied() {
 		foreach ($this->blocked_user_agents as $block_user_agent) {
-			if (!empty($block_user_agent) && strpos($_SERVER['HTTP_USER_AGENT'], $block_user_agent)) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- PCP warning. Sanitizing will interfere with 6g rules.
+			if (isset($_SERVER['HTTP_USER_AGENT']) && !empty($block_user_agent) && false !== stripos($_SERVER['HTTP_USER_AGENT'], $block_user_agent)) {
 				return Rule::SATISFIED;
 			}
 		}

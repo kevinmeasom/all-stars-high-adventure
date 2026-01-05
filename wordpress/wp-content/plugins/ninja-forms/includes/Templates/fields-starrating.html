@@ -1,15 +1,15 @@
 <script id="tmpl-nf-field-starrating" type="text/template">
-	<span class="starrating" aria-describedby="nf-error-{{{ data.id }}}">
+	<span id="nf-field-{{{ data.id }}}" class="starrating" aria-describedby="nf-error-{{{ data.id }}}" role="radiogroup">
 		{{{ data.renderRatings() }}}
     </span>
 </script>
 
 <script id="tmpl-nf-field-starrating-star" type="text/template">
-	<input type="radio" name="nf-field-{{{ data.id }}}"
-	       class="{{{ data.classes }}} nf-element" value="{{{ data.num }}}"
-	       {{{ data.checked }}}
-            <# if( data.required ) { #>
-			required
+	<input id="nf-field-{{{ data.id }}}-{{{ data.num }}}" aria-labelledby="nf-label-field-{{{ data.id }}}" type="radio" name="nf-field-{{{ data.id }}}"
+		class="{{{ data.classes }}} nf-element" value="{{{ data.num }}}" style="display:none"
+		{{{ data.checked }}}
+			<# if( data.required ) { #>
+			required aria-required="true"
 			<# } #>
 	/>
 </script>

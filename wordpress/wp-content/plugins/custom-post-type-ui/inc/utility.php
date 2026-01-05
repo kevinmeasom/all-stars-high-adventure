@@ -112,16 +112,16 @@ function cptui_footer( $original = '' ) {
 		esc_attr__( '%1$s version %2$s by %3$s', 'custom-post-type-ui' ),
 		esc_attr__( 'Custom Post Type UI', 'custom-post-type-ui' ),
 		CPTUI_VERSION,
-		'<a href="https://webdevstudios.com" target="_blank" rel="noopener">WebDevStudios</a>'
+		'<a href="https://webdevstudios.com">WebDevStudios</a>'
 	) . ' - ' .
 	sprintf(
 		// translators: Placeholders are just for HTML markup that doesn't need translated.
-		'<a href="http://wordpress.org/support/plugin/custom-post-type-ui" target="_blank" rel="noopener">%s</a>',
+		'<a href="https://wordpress.org/support/plugin/custom-post-type-ui">%s</a>',
 		esc_attr__( 'Support forums', 'custom-post-type-ui' )
 	) . ' - ' .
 	sprintf(
 		// translators: Placeholders are just for HTML markup that doesn't need translated.
-		'<a href="https://wordpress.org/plugins/custom-post-type-ui/reviews/" target="_blank" rel="noopener">%s</a>',
+		'<a href="https://wordpress.org/plugins/custom-post-type-ui/reviews/">%s</a>',
 		sprintf(
 			// translators: Placeholder will hold `<abbr>` tag for CPTUI.
 			esc_attr__( 'Review %s', 'custom-post-type-ui' ),
@@ -133,11 +133,11 @@ function cptui_footer( $original = '' ) {
 			)
 		)
 	) . ' - ' .
-	esc_attr__( 'Follow on Twitter:', 'custom-post-type-ui' ) .
+	esc_attr__( 'Follow on X:', 'custom-post-type-ui' ) .
 	sprintf(
 		// translators: Placeholders are just for HTML markup that doesn't need translated.
 		' %s',
-		'<a href="https://twitter.com/webdevstudios" target="_blank" rel="noopener">WebDevStudios</a>'
+		'<a href="https://x.com/webdevstudios">WebDevStudios</a>'
 	);
 }
 add_filter( 'admin_footer_text', 'cptui_footer' );
@@ -353,14 +353,14 @@ function cptui_products_sidebar() {
 
 			// Escaping $the_ad breaks the html.
 			printf(
-				'<p><a href="%s">%s</a></p>',
+				'<p><a href="%s" target="_blank">%s</a></p>',
 				esc_url( $ad['url'] ),
 				$the_ad // phpcs:ignore WordPress.Security.EscapeOutput
 			);
 		}
 		printf(
 			'<p><a href="%s">%s</a></p>',
-			'https://pluginize.com/plugins/custom-post-type-ui-extended/ref/pluginizeaff/?campaign=cptui-sidebar-remove',
+			'https://pluginize.com/plugins/custom-post-type-ui-extended/',
 			esc_html__( 'Remove these ads?', 'custom-post-type-ui' )
 		);
 	}
@@ -429,15 +429,9 @@ function cptui_newsletter_form() {
  * Add our Email Octopus scripts and stylesheet.
  *
  * @author Scott Anderson <scott.anderson@webdevstudios.com>
- * @since  NEXT
+ * @since  1.7.3
  */
-function enqueue_email_octopus_assets() {
-
-	$current_screen = get_current_screen();
-
-	if ( ! is_object( $current_screen ) ) {
-		return;
-	}
+function enqueue_email_octopus_assets( $hook ) {
 
 	$screens = [
 		'toplevel_page_cptui_main_menu',
@@ -445,7 +439,7 @@ function enqueue_email_octopus_assets() {
 		'cpt-ui_page_cptui_manage_taxonomies',
 	];
 
-	if ( ! in_array( $current_screen->base, $screens, true ) ) {
+	if ( ! in_array( $hook, $screens, true ) ) {
 		return;
 	}
 
@@ -501,21 +495,21 @@ function cptui_default_ads( $ads = [] ) {
 	];
 
 	$ads[] = [
-		'url'   => 'https://pluginize.com/plugins/instago/?utm_source=cptui-sidebar&utm_medium=text&utm_campaign=instago',
-		'image' => plugin_dir_url( __DIR__ ) . 'images/wds_ads/instago.png',
-		'text'  => 'InstaGo product ad',
+		'url'   => 'https://themeswitcher.com/?utm_source=cptui-sidebar&utm_medium=text&utm_campaign=themeswitcher-pro',
+		'image' => plugin_dir_url( __DIR__ ) . 'images/wds_ads/themeswitcher-pro.png',
+		'text'  => 'ThemeSwitcher Pro Plugin Ad',
+	];
+
+	$ads[] = [
+		'url'   => 'https://pluginize.com/plugins/wp-search-with-algolia-pro/?utm_source=cptui-sidebar&utm_medium=text&utm_campaign=wp-search-with-algolia-pro',
+		'image' => plugin_dir_url( __DIR__ ) . 'images/wds_ads/wp-search-with-algolia-pro.png',
+		'text'  => 'WP Search with Algolia Pro product ad',
 	];
 
 	$ads[] = [
 		'url'   => 'https://pluginize.com/plugins/buddypages/?utm_source=cptui-sidebar&utm_medium=text&utm_campaign=buddypages',
 		'image' => plugin_dir_url( __DIR__ ) . 'images/wds_ads/buddypages.png',
 		'text'  => 'BuddyPages product ad',
-	];
-
-	$ads[] = [
-		'url'   => 'https://maintainn.com/?utm_source=Pluginize-v2&utm_medium=Plugin-Sidebar&utm_campaign=CPTUI',
-		'image' => plugin_dir_url( __DIR__ ) . 'images/wds_ads/maintainn.png',
-		'text'  => 'Maintainn product ad',
 	];
 
 	return $ads;
@@ -543,7 +537,7 @@ function cptui_randomize_ads( $ads = [] ) {
 
 	return array_merge( $new_order, $ads );
 }
-add_filter( 'cptui_ads', 'cptui_randomize_ads', 11 );
+//add_filter( 'cptui_ads', 'cptui_randomize_ads', 11 );
 
 /**
  * Secondary admin notices function for use with admin_notices hook.
@@ -593,14 +587,14 @@ function cptui_admin_notices_helper( $message = '', $success = true ) {
  */
 function cptui_get_object_from_post_global() {
 	if ( isset( $_POST['cpt_custom_post_type']['name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-		$type_item = filter_input( INPUT_POST, 'cpt_custom_post_type', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
+		$type_item = filter_input( INPUT_POST, 'cpt_custom_post_type', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
 		if ( $type_item ) {
 			return sanitize_text_field( $type_item['name'] );
 		}
 	}
 
 	if ( isset( $_POST['cpt_custom_tax']['name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-		$tax_item = filter_input( INPUT_POST, 'cpt_custom_tax', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
+		$tax_item = filter_input( INPUT_POST, 'cpt_custom_tax', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
 		if ( $tax_item ) {
 			return sanitize_text_field( $tax_item['name'] );
 		}
@@ -1002,3 +996,59 @@ function cptui_get_add_new_link( $content_type = '' ) {
 
 	return cptui_admin_url( 'admin.php?page=cptui_manage_' . $content_type );
 }
+
+/**
+ * Register theme support for CPTUI based content types, for extra assurance.
+ *
+ * @since 1.14.0
+ */
+function cptui_post_thumbnail_theme_support() {
+	$post_types = cptui_get_post_type_data();
+
+	if ( empty( $post_types ) || ! is_array( $post_types ) ) {
+		return;
+	}
+
+	$supported = [];
+	foreach ( $post_types as $post_type ) {
+		if ( empty( $post_type['supports'] ) ) {
+			continue;
+		}
+		if (
+			// Some way, somehow, null can end up saved in the supports spot.
+			// Lets check for an array first.
+			is_array( $post_type['supports'] ) &&
+			in_array( 'thumbnail', $post_type['supports'] )
+		) {
+			$supported[] = $post_type['name'];
+		}
+	}
+	if ( ! empty( $supported ) ) {
+		add_theme_support( 'post-thumbnails', $supported );
+	}
+}
+add_action( 'after_setup_theme', 'cptui_post_thumbnail_theme_support' );
+
+function cptui_add_dialog_missing_post_type_confirm() {
+?>
+	<dialog id="cptui-select-post-type-confirm">
+		<p><?php esc_html_e( 'Please select a post type to associate with.', 'custom-post-type-ui' ); ?></p>
+		<button id="cptui-select-post-type-confirm-close" class="confirm button-secondary" type="button"><?php esc_html_e( 'OK', 'custom-post-type-ui' ); ?></button>
+	</dialog>
+<?php
+}
+add_action( 'cptui_taxonomy_after_fieldsets', 'cptui_add_dialog_missing_post_type_confirm' );
+
+function cptui_add_dialog_delete_content_type_confirm() {
+	?>
+	<dialog id="cptui-content-type-delete" class="wp-core-ui">
+		<p><?php esc_html_e( 'Are you sure you want to delete this? Deleting will NOT remove created content.', 'custom-post-type-ui' ); ?></p>
+		<div class="cptui-confirm-deny-delete">
+			<button id="cptui-content-type-confirm-delete" class="confirm button-secondary" type="button"><?php esc_html_e( 'OK', 'custom-post-type-ui' ); ?></button>
+			<button id="cptui-content-type-deny-delete" class="confirm button-secondary" type="button"><?php esc_html_e( 'Cancel', 'custom-post-type-ui' ); ?></button>
+		</div>
+	</dialog>
+	<?php
+}
+#add_action( 'cptui_post_type_after_fieldsets', 'cptui_add_dialog_delete_content_type_confirm' );
+#add_action( 'cptui_taxonomy_after_fieldsets', 'cptui_add_dialog_delete_content_type_confirm' );

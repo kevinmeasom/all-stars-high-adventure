@@ -17,9 +17,10 @@ class AIOWPSecurity_Cronjob_Handler {
 		add_action('aios_15_minutes_cron_event', array($this, 'aios_15_minutes_cron_event'));
 		add_action('aiowps_hourly_cron_event', array($this, 'aiowps_hourly_cron_event_handler'));
 		add_action('aiowps_daily_cron_event', array($this, 'aiowps_daily_cron_event_handler'));
-		add_action('aiowps_perform_failed_login_cleanup_task', array($this, 'failed_login_cleanup'));
+		add_action('aios_change_auth_keys_and_salt', 'AIOWPSecurity_Utility::change_salt_postfixes');
 		add_action('aiowps_purge_old_debug_logs', array($this, 'purge_old_debug_logs'));
 		add_action('aiowps_send_lockout_email', array($this, 'send_lockout_email'));
+		add_action('aios_update_googlebot_ip_ranges', array($this, 'aios_update_googlebot_ip_ranges'));
 	}
 
 	/**
@@ -72,6 +73,7 @@ class AIOWPSecurity_Cronjob_Handler {
 		//Do stuff that needs checking hourly
 		AIOWPSecurity_Comment::trash_spam_comments();
 		do_action('aiowps_perform_fcd_scan_tasks');
+		do_action('delete_expired_logged_in_users_event');
 	}
 	
 	/**
@@ -81,30 +83,10 @@ class AIOWPSecurity_Cronjob_Handler {
 	 */
 	public function aiowps_daily_cron_event_handler() {
 		do_action('aiowps_perform_db_cleanup_tasks');
-		do_action('aiowps_perform_failed_login_cleanup_task');
 		do_action('aiowps_purge_old_debug_logs');
 		do_action('aiowps_send_lockout_email');
-	}
-
-	/**
-	 * Purges 90 days old failed login records
-	 *
-	 * @return void
-	 */
-	public function failed_login_cleanup() {
-		global $wpdb, $aio_wp_security;
-
-		$purge_records_after_days = apply_filters('aiowps_purge_failed_login_records_after_days', AIOWPSEC_PURGE_FAILED_LOGIN_RECORDS_AFTER_DAYS);
-		$older_than_date_time 	  = date('Y-m-d H:m:s', strtotime('-' . $purge_records_after_days . ' days', current_time('timestamp', true)));
-		$sql					  = $wpdb->prepare('DELETE FROM ' . AIOWPSEC_TBL_FAILED_LOGINS . ' WHERE failed_login_date<%s', $older_than_date_time);
-		$ret_deleted			  = $wpdb->query($sql);
-		if (false === $ret_deleted) {
-			$err_db = !empty($wpdb->last_error) ? ' ('.$wpdb->last_error.' - '.$wpdb->last_query.')' : '';
-			// Status level 4 indicates failure status.
-			$aio_wp_security->debug_logger->log_debug_cron('Purge Failed Login Records - failed to purge solder failed login records.'.$err_db, 4);
-		} else {
-			$aio_wp_security->debug_logger->log_debug_cron(sprintf('Purge Failed Login Records - %d failed login records were deleted.', $ret_deleted));
-		}
+		do_action('aios_perform_update_antibot_keys');
+		do_action('aios_update_googlebot_ip_ranges');
 	}
 
 	/**
@@ -125,10 +107,10 @@ class AIOWPSecurity_Cronjob_Handler {
 		}
 
 		$after_days = empty($after_days) ? 90 : $after_days;
-		$older_than_date = date('Y-m-d H:m:s', strtotime("-{$after_days} days", strtotime(current_time('mysql', false))));
-		
-		$query = 'DELETE FROM ' . $debug_tbl_name . ' WHERE created < %s';
-		$ret = $wpdb->query($wpdb->prepare($query, $older_than_date));
+		$older_than_date_time = strtotime('-' . $after_days . ' days', time());
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- PCP warning. Ignore
+		$ret = $wpdb->query($wpdb->prepare('DELETE FROM ' . $debug_tbl_name . ' WHERE logtime < %s', $older_than_date_time));
 		if (false === $ret) {
 			$error_msg = empty($wpdb->last_error) ? 'Could not receive the reason for the failure' : $wpdb->last_error;
 			$aio_wp_security->debug_logger->log_debug_cron("Failed to purge older debug logs : {$error_msg}", 4);
@@ -142,5 +124,34 @@ class AIOWPSecurity_Cronjob_Handler {
 	public function send_lockout_email() {
 		global $aio_wp_security;
 		$aio_wp_security->user_login_obj->send_login_lockout_emails();
+	}
+
+	/**
+	 * Update Googlebot IP ranges for the firewall configuration.
+	 *
+	 * This function updates the Googlebot IP ranges in the firewall configuration.
+	 * It checks if the 'Block fake Googlebots' feature is enabled and then retrieves
+	 * the validated Googlebot IP ranges. If the IP ranges are retrieved successfully,
+	 * they are saved to the firewall configuration. If there is an error in retrieving
+	 * the IP ranges, a debug message is logged.
+	 *
+	 * @global object $aio_wp_security The main AIO WP Security object.
+	 * @global object $aiowps_firewall_config The AIO WP Security firewall configuration object.
+	 *
+	 * @return void
+	 */
+	public function aios_update_googlebot_ip_ranges() {
+		global $aio_wp_security;
+		$aiowps_firewall_config = AIOS_Firewall_Resource::request(AIOS_Firewall_Resource::CONFIG);
+
+		if ($aiowps_firewall_config->get_value('aiowps_block_fake_googlebots')) {
+			$validated_ip_list_array = AIOWPSecurity_Utility::get_googlebot_ip_ranges();
+
+			if (is_wp_error($validated_ip_list_array)) {
+				$aio_wp_security->debug_logger->log_debug('The attempt to save the IP addresses failed, because it was not possible to validate the Googlebot IP addresses: ' . $validated_ip_list_array->get_error_message(), 4);
+			}
+
+			$aiowps_firewall_config->set_value('aiowps_googlebot_ip_ranges', $validated_ip_list_array);
+		}
 	}
 }

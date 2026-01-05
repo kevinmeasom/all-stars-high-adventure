@@ -194,7 +194,7 @@ class NF_Admin_Menus_ImportExport extends NF_Abstracts_Submenu
             'builderURL'                            => admin_url( 'admin.php?page=ninja-forms&form_id=' ),
         ));
 
-        wp_enqueue_script( 'jBox', Ninja_Forms::$url . 'assets/js/lib/jBox.min.js', array( 'jquery' ) );
+        wp_enqueue_script( 'jBox', Ninja_Forms::$url . 'assets/js/min/jBox.min.js', array( 'jquery' ) );
         wp_enqueue_style( 'jBox', Ninja_Forms::$url . 'assets/css/jBox.css' );
         wp_enqueue_script( 'nf-ninja-modal', Ninja_Forms::$url . 'assets/js/lib/ninjaModal.js', array( 'jquery' ) );
         wp_enqueue_script( 'nf-batch-processor', Ninja_Forms::$url . 'assets/js/lib/batch-processor.js', array( 'jquery' ) );
@@ -312,7 +312,7 @@ class NF_Admin_Menus_ImportExport extends NF_Abstracts_Submenu
         }
 
         if( 'submit' == $field[ 'type' ] ){
-            $field[ 'processing_label' ] = 'Processing';
+            $field[ 'processing_label' ] = esc_html__( 'Processing', 'ninja-forms' );
         }
 
         if( 'calc' == $field[ 'type' ] ){

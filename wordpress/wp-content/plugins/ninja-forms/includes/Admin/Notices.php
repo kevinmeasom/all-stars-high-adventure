@@ -84,7 +84,7 @@ class NF_Admin_Notices
                 }
             }
 
-            
+
 
             // Check for required fields
             if ( ! $this->required_fields( $admin_notices[ $slug ] ) ) {
@@ -139,7 +139,7 @@ class NF_Admin_Notices
                         </ul>';
                     echo '</div>';
                     if ( $admin_can_dismiss ) {
-                        echo '<a href="' . wp_nonce_url( esc_attr( $query_str ) ) . '" class="dashicons dashicons-dismiss"></a>';
+                        echo '<a href="' . wp_nonce_url( esc_attr( $query_str ) ) . '" class="dashicons dashicons-dismiss"><span class="sr-only">Dismiss</span></a>';
                     }
                     echo '</div>';
 
@@ -171,7 +171,7 @@ class NF_Admin_Notices
         // If user clicks to ignore the notice, update the option to not show it again
         if ( isset($_GET['nf_admin_notice_ignore']) && current_user_can( apply_filters( 'ninja_forms_admin_parent_menu_capabilities', 'manage_options' ) ) ) {
 
-            if ( ! check_admin_referer() ) {
+            if ( ! check_admin_referer("nf_admin_notice_ignore") ) {
                 $query_str = remove_query_arg( array( 'nf_admin_notice_ignore', '_wpnonce' ) );
                 wp_safe_redirect( $query_str );
                 exit;

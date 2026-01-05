@@ -3,7 +3,7 @@
 /**
  * Class NF_MergeTags_WordPress
  */
-final class NF_MergeTags_WP extends NF_Abstracts_MergeTags
+class NF_MergeTags_WP extends NF_Abstracts_MergeTags
 {
     protected $id = 'wp';
 
@@ -21,6 +21,10 @@ final class NF_MergeTags_WP extends NF_Abstracts_MergeTags
      */
     public function replace( $subject )
     {
+        if(is_null($subject)){
+            return '';
+        }
+        
         // Recursively replace merge tags.
 
         if( is_array( $subject ) ){
@@ -55,7 +59,8 @@ final class NF_MergeTags_WP extends NF_Abstracts_MergeTags
          * Replace Custom User Meta
          * {user_meta:foo} --> meta key is 'foo'
          */
-        $user_id = get_current_user_id();
+        $user_id = $this->getCurrentUserId();
+
         preg_match_all( "/{user_meta:(.*?)}/", $subject, $user_meta_matches );
         // if user is logged in and we have user_meta merge tags
         if( ! empty( $user_meta_matches[0] ) && $user_id != 0  ) {
@@ -63,16 +68,49 @@ final class NF_MergeTags_WP extends NF_Abstracts_MergeTags
              * $matches[0][$i]  merge tag match     {user_meta:foo}
              * $matches[1][$i]  captured meta key   foo
              */
-            foreach( $user_meta_matches[0] as $i => $search ) {
+            foreach ($user_meta_matches[0] as $i => $search) {
                 $meta_key = $user_meta_matches[1][$i];
-                $meta_value = get_user_meta( $user_id, $meta_key, /* $single */ true );
-                $subject = str_replace( $search, $meta_value, $subject );
+
+                $meta_value = $this->getUserMeta($user_id, $meta_key);
+
+                // Only attempt replacement if meta value is string
+                if (is_string($meta_value)) {
+
+                    $subject = str_replace($search, $meta_value, $subject);
+                }
             }
+            
         // if a user is not logged in, but there are user_meta merge tags
         } elseif ( ! empty( $user_meta_matches[0] ) && $user_id == 0 ) {
         	$subject = '';
         }
         return parent::replace( $subject );
+    }
+
+    /**
+     * Wrap WP get_user_meta to enable unit testing
+     *
+     * @param int $user_id
+     * @param string $meta_key
+     * @return mixed
+     */
+    protected function getUserMeta($user_id, $meta_key)
+    {
+        $return = get_user_meta( $user_id, $meta_key, true );
+
+        return $return;
+    }
+
+    /**
+     * Return the current user Id
+     *
+     * @return void
+     */
+    protected function getCurrentUserId( ): int
+    {
+        $return = get_current_user_id();
+        
+        return $return;
     }
 
     protected function post_id()

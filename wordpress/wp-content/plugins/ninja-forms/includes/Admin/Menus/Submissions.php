@@ -25,6 +25,9 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
      */
     public $position = 3;
 
+    /** @var int */
+    public $load_legacy;
+    
     /**
      * Constructor
      */
@@ -388,7 +391,7 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
 
                 if ( isset ( $_REQUEST['form_id'] ) && ! empty ( $_REQUEST['form_id'] ) ) {
                     $redirect = urlencode( remove_query_arg( array( 'download_all', 'download_file' ) ) );
-                    $url = admin_url( 'admin.php?page=nf-processing&action=download_all_subs&form_id=' . absint( $_REQUEST['form_id'] ) . '&redirect=' . $redirect );
+                    $url = admin_url( 'admin.php?page=nf-processing&action=download_all_subs&form_id=' . absint( $_REQUEST['form_id'] ) . '&redirect=' . $redirect . '&security=' . wp_create_nonce( 'ninja_forms_batch_nonce' ) );
                     $url = esc_url( $url );
                     ?>
                     var button = '<a href="<?php echo $url; ?>" class="button-secondary nf-download-all"><?php echo esc_html__( 'Download All Submissions', 'ninja-forms' ); ?></a>';
@@ -396,7 +399,10 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
                 }
 
                 if ( isset ( $_REQUEST['download_all'] ) && $_REQUEST['download_all'] != '' ) {
-                    $redirect = esc_url_raw( add_query_arg( array( 'download_file' => esc_html( $_REQUEST['download_all'] ) ) ) );
+                    $redirect = esc_url_raw( add_query_arg( array( 
+                        'download_file' => esc_html( $_REQUEST['download_all'] ),
+                        '_wpnonce' => wp_create_nonce( 'ninja_forms_download_submission_nonce' )
+                    ) ) );
                     $redirect = remove_query_arg( array( 'download_all' ), $redirect );
                     ?>
                     document.location.href = "<?php echo $redirect; ?>";
@@ -412,9 +418,16 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
 
     public function export_listen()
     {
-        // Bail if we aren't in the admin
-        if (!is_admin())
+        $current_user_can_get_nf_submissions = apply_filters( 'ninja_forms_api_allow_get_submissions', current_user_can( 'manage_options' ) );
+        // Ensure that we are in admin and user has permission to export
+        if (
+            !is_admin() ||
+            !is_user_logged_in() ||
+            !$current_user_can_get_nf_submissions
+        ) {
+
             return false;
+        }
 
         if (!isset ($_REQUEST['form_id']) || empty ($_REQUEST['form_id'])) {
             return false;
@@ -435,6 +448,11 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
         }
 
         if (isset ($_REQUEST['download_file']) && !empty($_REQUEST['download_file'])) {
+
+            // Verify nonce for CSRF protection
+            if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'ninja_forms_download_submission_nonce' ) ) {
+                wp_die( 'Security check failed' );
+            }
 
             // Open our download all file
             $filename = esc_html($_REQUEST['download_file']);
@@ -700,6 +718,14 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
                 //Enqueue Submissions style
                 wp_enqueue_style( 'ninja_forms_admin_submissions_style', Ninja_Forms::$url . 'build/submissions.scss.css',  [], $submissions_asset_scss_version );
 
+                //Enqueue signature fonts for proper display in submissions table
+                wp_enqueue_style(
+                    'nf-signature-fonts',
+                    Ninja_Forms::$url . 'assets/fonts/signature/google-fonts.css',
+                    [],
+                    Ninja_Forms::VERSION
+                );
+
                 //Get all forms, to base form selector on.
                 $forms = Ninja_Forms()->form()->get_forms();
                 if (!empty($forms)) {
@@ -735,6 +761,7 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
                     'timeFormat'            =>  esc_attr( get_option('time_format') ),
                     'siteUrl'               =>  esc_url_raw( site_url() ),
                     'adminUrl'              =>  esc_url_raw( admin_url() ),
+                    'pluginsUrl'            =>  esc_url_raw( plugins_url() ),
                     'restUrl'               =>  esc_url_raw( get_rest_url() ),
                     'token'                 =>  wp_create_nonce( 'wp_rest' ),
                     'submissionsSettings'   =>  get_option( 'ninja_forms_submissions_settings' )

@@ -52,6 +52,16 @@ nfRadio.channel( 'form' ).on( 'render:view', function() {
 			};
 		}
 	} );
+
+	jQuery( '.cf-turnstile' ).each( function() {
+		var callback = jQuery( this ).data( 'callback' );
+		var fieldID = jQuery( this ).data( 'fieldid' );
+		if ( typeof window[ callback ] !== 'function' ){
+			window[ callback ] = function( response ) {
+				nfRadio.channel( 'turnstile' ).request( 'update:response', response, fieldID );
+			};
+		}
+	} );
 } );
 
 var nfRecaptcha = Marionette.Object.extend( {
@@ -83,7 +93,8 @@ var nfRecaptcha = Marionette.Object.extend( {
 
 			if ( opts.size === 'invisible' ) {
 				try {
-					grecaptcha.execute( grecaptchaID );
+					nf_reprocess_recaptcha( grecaptchaID  );
+					setInterval(nf_reprocess_recaptcha, 110000, grecaptchaID);
 				} catch( e ){
 					console.log( 'Notice: Error trying to execute grecaptcha.' );
 				}
@@ -94,6 +105,53 @@ var nfRecaptcha = Marionette.Object.extend( {
 
 var nfRenderRecaptcha = function() {
 	new nfRecaptcha();
+}
+
+var nfTurnstile = Marionette.Object.extend( {
+	initialize: function() {
+		/*
+		 * If we've already rendered our form view, render our turnstile fields.
+		 */
+		if ( 0 != jQuery( '.cf-turnstile' ).length ) {
+			this.renderTurnstile();
+		}
+		/*
+		 * We haven't rendered our form view, so hook into the view render radio message, and then render.
+		 */
+		this.listenTo( nfRadio.channel( 'form' ), 'render:view', this.renderTurnstile );
+        this.listenTo( nfRadio.channel( 'captcha' ), 'reset', this.renderTurnstile );
+	},
+
+	renderTurnstile: function() {
+		if ( typeof turnstile === 'undefined' ) {
+			return;
+		}
+		
+		jQuery( '.cf-turnstile:empty' ).each( function() {
+			var opts = {
+				'theme': jQuery( this ).data( 'theme' ),
+				'size': jQuery( this ).data( 'size' ),
+				'sitekey': jQuery( this ).data( 'sitekey' ),
+				'callback': jQuery( this ).data( 'callback' )
+			};
+
+			try {
+				turnstile.render( jQuery( this )[0], opts );
+			} catch( e ){
+				// Silent fail
+			}
+		} );
+	}
+} );
+
+var nfRenderTurnstile = function() {
+	new nfTurnstile();
+}
+
+if (typeof nf_reprocess_recaptcha === 'undefined') {
+	const nf_reprocess_recaptcha = ( grecaptchaID ) => {
+		grecaptcha.execute( grecaptchaID );
+	}
 }
 
 const nf_check_recaptcha_consent = () => {
@@ -147,3 +205,51 @@ const nf_reload_after_cookie_consent = ( submitFieldID, layoutView ) => {
 		nfRadio.channel( 'form' ).trigger( 'render:view', layoutView );
 	}
 }
+
+const nf_add_reCaptcha_aria = () => {
+	
+	// Callback function to execute when mutations are observed
+	const nf_act_on_inserted_node = (mutationList, observer) => {
+		for (const mutation of mutationList) {
+			if (mutation.type === 'childList' && mutation.target.className === "g-recaptcha") {
+				let nf_recaptchaTextarea = document.getElementById("g-recaptcha-response");
+				if(typeof nf_recaptchaTextarea !== "undefined" ){
+					nf_recaptchaTextarea.setAttribute("aria-hidden", "true");
+					nf_recaptchaTextarea.setAttribute("aria-label", "Silent reCaptcha security check");
+					nf_recaptchaTextarea.setAttribute("aria-readonly", "true");
+					observer.disconnect();
+				}
+			}
+		}
+		observer.disconnect();
+	};
+	//Observe Forms
+	const nf_forms_listed = document.querySelectorAll(".ninja-forms-form-wrap");
+	if(nf_forms_listed.length > 0){
+		let nf_recaptcha_observers = [];
+		nf_forms_listed.forEach((nf_form) => {
+			nf_recaptcha_observers.push({"class": new MutationObserver(nf_act_on_inserted_node), "element": nf_form});
+		});
+		//Add an observer for each form
+		if( nf_recaptcha_observers.length > 0){
+			nf_recaptcha_observers.forEach((object) => {
+				object.class.observe( object.element, 
+					{ childList: true, subtree: true }
+				);
+			});
+		}
+	}
+}
+
+const nf_remove_noscript_tags_as_needed = () => {
+	const noscripts = document.getElementsByClassName('ninja-forms-noscript-message')
+
+	for (let i = 0; i < noscripts.length; i++) {
+		noscripts[i].parentNode.removeChild(noscripts[i])
+	}
+}
+
+jQuery(document).on( 'nfFormReady', () => {
+	nf_remove_noscript_tags_as_needed();
+	nf_add_reCaptcha_aria();
+});

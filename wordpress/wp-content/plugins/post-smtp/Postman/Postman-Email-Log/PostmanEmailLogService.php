@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once dirname(__DIR__ ) . '/PostmanLogFields.php';
 require_once POST_SMTP_PATH . '/Postman/Extensions/Core/Notifications/PostmanNotify.php';
 require_once POST_SMTP_PATH . '/Postman/Extensions/Core/StatusSolution.php';
+require_once POST_SMTP_PATH . '/Postman/PostmanEmailLogs.php';
 
 if ( ! class_exists( 'PostmanEmailLog' ) ) {
 	class PostmanEmailLog {
@@ -52,15 +53,19 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 		// member variables
 		private $logger;
 		private $inst;
+		public $new_logging = false;
 
 		/**
 		 * Constructor
 		 */
 		private function __construct() {
+
 			$this->logger = new PostmanLogger( get_class( $this ) );
+			$this->new_logging = get_option( 'postman_db_version' );
 
 			add_action('post_smtp_on_success', array( $this, 'write_success_log' ), 10, 4 );
 			add_action('post_smtp_on_failed', array( $this, 'write_failed_log' ), 10, 5 );
+
 		}
 
 		/**
@@ -74,17 +79,17 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 			return $inst;
 		}
 
-		public function write_success_log($log, $message, $transcript, $transport) {
+		public function write_success_log( $log, $message, $transcript, $transport = null ) {
 		    $options = PostmanOptions::getInstance();
             if ( $options->getRunMode() == PostmanOptions::RUN_MODE_PRODUCTION || $options->getRunMode() == PostmanOptions::RUN_MODE_LOG_ONLY ) {
                 $this->writeSuccessLog( $log, $message, $transcript, $transport );
             }
         }
 
-        public function write_failed_log($log, $message, $transcript, $transport, $statusMessage) {
+        public function write_failed_log( $log, $message, $transcript, $transport = null, $statusMessage = null ) {
             $options = PostmanOptions::getInstance();
             if ( $options->getRunMode() == PostmanOptions::RUN_MODE_PRODUCTION || $options->getRunMode() == PostmanOptions::RUN_MODE_LOG_ONLY ) {
-                $this->writeFailureLog( $log, $message, $transcript, $transport, $statusMessage );
+				$this->writeFailureLog( $log, $transcript, $statusMessage, $transport, $message );
             }
         }
 
@@ -93,9 +98,9 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 		 *
 		 * @param PostmanMessage         $message
 		 * @param mixed                $transcript
-		 * @param PostmanModuleTransport $transport
+		 * @param PostmanModuleTransport|null $transport
 		 */
-		public function writeSuccessLog( PostmanEmailLog $log, PostmanMessage $message, $transcript, PostmanModuleTransport $transport ) {
+		public function writeSuccessLog( PostmanEmailLog $log, PostmanMessage $message, $transcript, ?PostmanModuleTransport $transport = null ) {
 			if ( PostmanOptions::getInstance()->isMailLoggingEnabled() ) {
 				$statusMessage = '';
 				$status = true;
@@ -104,7 +109,13 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 					$statusMessage = sprintf( '%s: %s', __( 'Warning', 'post-smtp' ), __( 'An empty subject line can result in delivery failure.', 'post-smtp' ) );
 					$status = 'WARN';
 				}
-				$this->createLog( $log, $message, $transcript, $statusMessage, $status, $transport );
+				
+				$logger = $this->logger;
+				if ( is_null( $transport ) ) {
+					$logger->warn( 'writeSuccessLog called with null transport' );
+				}
+				
+				$this->createLog( $log, $transcript, $statusMessage, $status, $transport, $message );
 				$this->writeToEmailLog( $log );
 			}
 		}
@@ -114,18 +125,59 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 		 *
 		 * @param PostmanMessage         $message
 		 * @param mixed                $transcript
-		 * @param PostmanModuleTransport $transport
 		 * @param mixed                $statusMessage
 		 * @param mixed                $originalTo
 		 * @param mixed                $originalSubject
 		 * @param mixed                $originalMessage
+		 * @param PostmanModuleTransport|null $transport
 		 * @param mixed                $originalHeaders
 		 */
-		public function writeFailureLog( PostmanEmailLog $log, PostmanMessage $message = null, $transcript, PostmanModuleTransport $transport, $statusMessage ) {
+	public function writeFailureLog( PostmanEmailLog $log, $transcript, $statusMessage, ?PostmanModuleTransport $transport = null, ?PostmanMessage $message = null ) {
 			if ( PostmanOptions::getInstance()->isMailLoggingEnabled() ) {
-				$this->createLog( $log, $message, $transcript, $statusMessage, false, $transport );
+				
+				if ( is_null( $transport ) ) {
+					$this->logger->warn( 'writeFailureLog called with null transport' );
+				}
+
+				$this->createLog( $log, $transcript, $statusMessage, false, $transport, $message );
 				$this->writeToEmailLog( $log,$message );
 			}
+		}
+
+		/**
+		 * Sanitizes a list of emails, handling both single and multiple email inputs.
+		 *
+		 * @param string|array $emails The email(s) to sanitize.
+		 * @return string Sanitized email(s) as a comma-separated string.
+		 * @since 3.1.2
+		 * @version 1.0.0
+		 */
+		public function sanitize_emails( $emails ) {
+			if ( empty( $emails ) ) {
+				return '';
+			}
+
+			// Convert string to an array if necessary.
+			if ( is_string( $emails ) ) {
+				$emails = explode( ',', $emails );
+			}
+
+			if ( ! is_array( $emails ) ) {
+				return '';
+			}
+
+			$sanitized_emails = array_map( function ( $email ) {
+				$email = trim( $email );
+
+				// Extract email from "Name <email>" format.
+				if ( preg_match( '/<(.+?)>/', $email, $matches ) ) {
+					$email = $matches[1];
+				}
+
+				return filter_var( $email, FILTER_VALIDATE_EMAIL ) ? sanitize_email( $email ) : '';
+			}, $emails );
+
+			return implode( ', ', array_filter( $sanitized_emails ) );
 		}
 
 		/**
@@ -133,7 +185,7 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 		 *
 		 * From http://wordpress.stackexchange.com/questions/8569/wp-insert-post-php-function-and-custom-fields
 		 */
-		private function writeToEmailLog( PostmanEmailLog $log, PostmanMessage $message = null ) {
+		private function writeToEmailLog( PostmanEmailLog $log, ?PostmanMessage $message = null ) {
 
 		    $options = PostmanOptions::getInstance();
 
@@ -148,68 +200,128 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
             }
 
             $new_status = apply_filters( 'post_smtp_log_status', $new_status, $log, $message );
+			//If Table exists, Insert Log into Table
+			if( $this->new_logging ) {
+				$data = array();
+				$data['solution']         = apply_filters( 'post_smtp_log_solution', null, $new_status, $log, $message );
+				$data['success']          = empty( $new_status ) ? 1 : $new_status;
+				$data['from_header']      = $log->sender;
+				$data['to_header']        = $this->sanitize_emails( $log->toRecipients );
+				$data['cc_header']        = $this->sanitize_emails( $log->ccRecipients );
+				$data['bcc_header']       = $this->sanitize_emails( $log->bccRecipients );
+				$data['reply_to_header']  = $this->sanitize_emails( $log->replyTo );
+				$data['transport_uri']    = !empty( $log->transportUri ) ? $log->transportUri : '';
+				$data['original_to']      = $this->sanitize_emails( $log->originalTo );
+				$data['original_subject'] = !empty( $log->originalSubject ) ? sanitize_text_field( $log->originalSubject ) : '';
+				$data['original_message'] = $log->originalMessage;
+			    $data['original_headers'] = is_array( $log->originalHeaders ) ? serialize( $log->originalHeaders ) : $log->originalHeaders;
+				$data['session_transcript'] = $log->sessionTranscript;
 
-			// nothing here is sanitized as WordPress should take care of
-			// making database writes safe
-			$my_post = array(
+				$email_logs = new PostmanEmailLogs();
+
+				/**
+				 * Filter the email log id
+				 * 
+				 * @param string $log_id
+				 * @since 2.5.0
+				 * @version 1.0.0
+				 */
+				$log_id = apply_filters( 'post_smtp_update_email_log_id', '' );
+				$log_id = $email_logs->save( $data, $log_id );
+				
+				/**
+				 * Fires after the email log is saved
+				 * 
+				 * @param string $log_id
+				 * @since 2.5.0
+				 * @version 1.0.0
+				 */
+
+				do_action( 'post_smtp_after_email_log_saved', $log_id );
+
+				$this->logger->debug( sprintf( 'Saved message #%s to the database', $log_id ) );
+				$this->logger->trace( $log );
+
+			} 
+			//Do as previous
+			else {
+
+				// nothing here is sanitized as WordPress should take care of
+				// making database writes safe
+				$my_post = array(
 					'post_type' => PostmanEmailLogPostType::POSTMAN_CUSTOM_POST_TYPE_SLUG,
 					'post_title' => $log->subject,
 					'post_content' => $log->body,
 					'post_excerpt' => $new_status,
 					'post_status' => PostmanEmailLogService::POSTMAN_CUSTOM_POST_STATUS_PRIVATE,
-			);
+				);
 
-			// Insert the post into the database (WordPress gives us the Post ID)
-			$post_id = wp_insert_post( $my_post, true );
+				// Insert the post into the database (WordPress gives us the Post ID)
+				$post_id = wp_insert_post( $my_post, true );
 
-			if ( is_wp_error( $post_id ) ) {
-			    add_action( 'admin_notices', function() use( $post_id ) {
-                    $class = 'notice notice-error';
-                    $message = $post_id->get_error_message();
+				if ( is_wp_error( $post_id ) ) {
+					add_action( 'admin_notices', function() use( $post_id ) {
+						$class = 'notice notice-error';
+						$message = $post_id->get_error_message();
+	
+						printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+					});
+	
+					return;
+				}
 
-                    printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
-                });
+				$this->logger->debug( sprintf( 'Saved message #%s to the database', $post_id ) );
+				$this->logger->trace( $log );
 
-			    return;
-            }
+				$solution = apply_filters( 'post_smtp_log_solution', null, $new_status, $log, $message );
 
-			$this->logger->debug( sprintf( 'Saved message #%s to the database', $post_id ) );
-			$this->logger->trace( $log );
+				// Write the meta data related to the email
+				PostmanLogFields::get_instance()->update( $post_id, 'solution', $solution );
+				PostmanLogFields::get_instance()->update( $post_id, 'success', $log->success );
+				PostmanLogFields::get_instance()->update( $post_id, 'from_header', $log->sender );
+				if ( ! empty( $log->toRecipients ) ) {
+					PostmanLogFields::get_instance()->update( $post_id, 'to_header', $log->toRecipients );
+				}
+				if ( ! empty( $log->ccRecipients ) ) {
+					PostmanLogFields::get_instance()->update( $post_id, 'cc_header', $log->ccRecipients );
+				}
+				if ( ! empty( $log->bccRecipients ) ) {
+					PostmanLogFields::get_instance()->update( $post_id, 'bcc_header', $log->bccRecipients );
+				}
+				if ( ! empty( $log->replyTo ) ) {
+					PostmanLogFields::get_instance()->update( $post_id, 'reply_to_header', $log->replyTo );
+				}
+				PostmanLogFields::get_instance()->update( $post_id, 'transport_uri', $log->transportUri );
 
-			$solution = apply_filters( 'post_smtp_log_solution', null, $new_status, $log, $message );
+				if ( ! $log->success || true ) {
+					// alwas add the meta data so we can re-send it
+					PostmanLogFields::get_instance()->update( $post_id, 'original_to', $log->originalTo );
+					PostmanLogFields::get_instance()->update( $post_id, 'original_subject', $log->originalSubject );
+					PostmanLogFields::get_instance()->update( $post_id, 'original_message', $log->originalMessage );
+					PostmanLogFields::get_instance()->update( $post_id, 'original_headers', $log->originalHeaders );
+				}
 
-			// Write the meta data related to the email
-			PostmanLogFields::get_instance()->update( $post_id, 'solution', $solution );
-			PostmanLogFields::get_instance()->update( $post_id, 'success', $log->success );
-			PostmanLogFields::get_instance()->update( $post_id, 'from_header', $log->sender );
-			if ( ! empty( $log->toRecipients ) ) {
-                PostmanLogFields::get_instance()->update( $post_id, 'to_header', $log->toRecipients );
+				// we do not sanitize the session transcript - let the reader decide how to handle the data
+				PostmanLogFields::get_instance()->update( $post_id, 'session_transcript', $log->sessionTranscript );
+
 			}
-			if ( ! empty( $log->ccRecipients ) ) {
-                PostmanLogFields::get_instance()->update( $post_id, 'cc_header', $log->ccRecipients );
-			}
-			if ( ! empty( $log->bccRecipients ) ) {
-                PostmanLogFields::get_instance()->update( $post_id, 'bcc_header', $log->bccRecipients );
-			}
-			if ( ! empty( $log->replyTo ) ) {
-                PostmanLogFields::get_instance()->update( $post_id, 'reply_to_header', $log->replyTo );
-			}
-            PostmanLogFields::get_instance()->update( $post_id, 'transport_uri', $log->transportUri );
-
-			if ( ! $log->success || true ) {
-				// alwas add the meta data so we can re-send it
-                PostmanLogFields::get_instance()->update( $post_id, 'original_to', $log->originalTo );
-                PostmanLogFields::get_instance()->update( $post_id, 'original_subject', $log->originalSubject );
-                PostmanLogFields::get_instance()->update( $post_id, 'original_message', $log->originalMessage );
-                PostmanLogFields::get_instance()->update( $post_id, 'original_headers', $log->originalHeaders );
-			}
-
-			// we do not sanitize the session transcript - let the reader decide how to handle the data
-            PostmanLogFields::get_instance()->update( $post_id, 'session_transcript', $log->sessionTranscript );
 
 			// truncate the log (remove older entries)
 			$purger = new PostmanEmailLogPurger();
-			$purger->truncateLogItems( PostmanOptions::getInstance()->getMailLoggingMaxEntries() );
+
+			/**
+			 * Filter whether to truncate the log
+			 * 
+			 * @param bool $truncate
+			 * @since 2.6.1
+			 * @version 1.0.0
+			 */
+			if( apply_filters( 'post_smtp_truncate_the_log', true ) ) {
+
+				$purger->truncateLogItems( PostmanOptions::getInstance()->getMailLoggingMaxEntries() );
+
+			}
+			
 		}
 
 		/**
@@ -219,10 +331,10 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 		 * @param mixed                $transcript
 		 * @param mixed                $statusMessage
 		 * @param mixed                $success
-		 * @param PostmanModuleTransport $transport
+		 * @param PostmanModuleTransport|null $transport
 		 * @return PostmanEmailLog
 		 */
-		private function createLog( PostmanEmailLog $log, PostmanMessage $message = null, $transcript, $statusMessage, $success, PostmanModuleTransport $transport ) {
+		private function createLog( PostmanEmailLog $log, $transcript, $statusMessage, $success, ?PostmanModuleTransport $transport, ?PostmanMessage $message = null ) {
 			if ( $message ) {
 				$log->sender = $message->getFromAddress()->format();
 				$log->toRecipients = $this->flattenEmails( $message->getToRecipients() );
@@ -231,13 +343,18 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 				$log->subject = $message->getSubject();
 				$log->body = $message->getBody();
 				if ( null !== $message->getReplyTo() ) {
-					$log->replyTo = $message->getReplyTo()->format();
+						$log->replyTo = $message->getReplyTo()->format();
 				}
 			}
 			$log->success = $success;
 			$log->statusMessage = $statusMessage;
-			$log->transportUri = PostmanTransportRegistry::getInstance()->getPublicTransportUri( $transport );
-			$log->sessionTranscript = $log->transportUri . "\n\n" . $transcript;
+			if ( $transport ) {
+				$log->transportUri = PostmanTransportRegistry::getInstance()->getPublicTransportUri( $transport );
+				$log->sessionTranscript = $log->transportUri . "\n\n" . $transcript;
+			} else {
+				$log->transportUri = '';
+				$log->sessionTranscript = $transcript;
+			}
 			return $log;
 		}
 
@@ -268,16 +385,53 @@ if ( ! class_exists( 'PostmanEmailLogService' ) ) {
 
 if ( ! class_exists( 'PostmanEmailLogPurger' ) ) {
 	class PostmanEmailLogPurger {
-		private $posts;
+
+		private $logs;
 		private $logger;
+		private $new_logging;
+		private $email_logs;
 
 		/**
 		 *
 		 * @return mixed
 		 */
-		function __construct( $args = array() ) {
+		function __construct() {
+
+			$this->new_logging = get_option( 'postman_db_version' );
+
+			$this->get_logs();
+			$this->email_logs = new PostmanEmailLogs();
 			$this->logger = new PostmanLogger( get_class( $this ) );
-			$defaults = array(
+			
+		}
+
+
+		/**
+		 * Get Logs
+		 * 
+		 * @since 2.5.0
+		 * @version 1.0.0
+		 */
+		public function get_logs() {
+
+			if( !$this->new_logging ) {
+
+				$this->get_old_logs();
+
+			}
+
+		}
+
+
+		/**
+		 * Gets Logs From _posts table
+		 * 
+		 * @since 2.5.0
+		 * @version 1.0.0
+		 */
+		public function get_old_logs() {
+
+			$args = array(
 					'posts_per_page' => -1,
 					'offset' => 0,
 					'category' => '',
@@ -294,9 +448,24 @@ if ( ! class_exists( 'PostmanEmailLogPurger' ) ) {
 					'post_status' => 'private',
 					'suppress_filters' => true,
 			);
-			$args = wp_parse_args( $args, $defaults );
+			
 			$query = new WP_Query( $args );
-			$this->posts = $query->posts;
+			$this->logs = $query->posts;
+
+		}
+		
+		
+		/**
+		 * Get logs from _post_smtp_logs table
+		 * 
+		 * @since 2.5.0
+		 * @version 1.0.0
+		 */
+		public function get_new_logs() {
+
+			$logs = new PostmanEmailLogs();
+			$this->logs = $logs->get_logs();
+
 		}
 
 		/**
@@ -306,7 +475,7 @@ if ( ! class_exists( 'PostmanEmailLogPurger' ) ) {
 		 */
 		function verifyLogItemExistsAndRemove( $postid ) {
 			$force_delete = true;
-			foreach ( $this->posts as $post ) {
+			foreach ( $this->logs as $post ) {
 				if ( $post->ID == $postid ) {
 					$this->logger->debug( 'deleting log item ' . intval( $postid ) );
 					wp_delete_post( $postid, $force_delete );
@@ -316,11 +485,24 @@ if ( ! class_exists( 'PostmanEmailLogPurger' ) ) {
 			$this->logger->warn( 'could not find Postman Log Item #' . $postid );
 		}
 		function removeAll() {
-			$this->logger->debug( sprintf( 'deleting %d log items ', sizeof( $this->posts ) ) );
-			$force_delete = true;
-			foreach ( $this->posts as $post ) {
-				wp_delete_post( $post->ID, $force_delete );
+			
+			if( $this->new_logging ) {
+
+				$email_query_log = new PostmanEmailQueryLog();
+				$delete = $email_query_log->delete_logs( array( -1 ) );
+				$this->logger->debug( sprintf( 'Delete Response: %s', $delete ) );
+
 			}
+			else {
+				
+				$this->logger->debug( sprintf( 'deleting %d log items ', sizeof( $this->logs ) ) );
+				$force_delete = true;
+				foreach ( $this->logs as $post ) {
+					wp_delete_post( $post->ID, $force_delete );
+				}
+
+			}
+
 		}
 
 		/**
@@ -328,13 +510,24 @@ if ( ! class_exists( 'PostmanEmailLogPurger' ) ) {
 		 * @param mixed $size
 		 */
 		function truncateLogItems( $size ) {
-			$index = count( $this->posts );
-			$force_delete = true;
-			while ( $index > $size ) {
-				$postid = $this->posts [ -- $index ]->ID;
-				$this->logger->debug( 'deleting log item ' . $postid );
-				wp_delete_post( $postid, $force_delete );
+
+			if( $this->new_logging ) {
+
+				$this->email_logs->truncate_log_items( $size );
+			
 			}
+			else {
+
+				$index = count( $this->logs );
+				$force_delete = true;
+				while ( $index > $size ) {
+					$postid = $this->logs [ -- $index ]->ID;
+					$this->logger->debug( 'deleting log item ' . $postid );
+					wp_delete_post( $postid, $force_delete );
+				}
+
+			}
+
 		}
 	}
 }
